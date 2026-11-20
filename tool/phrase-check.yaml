@@ -1,0 +1,43 @@
+# Forbidden phrases for `melos run phrase-check` (core/tooling/tooling's
+# `phrase_check`, run in CI as the `phrase-check` step).
+#
+# What this is for: a clone in a regulated field must never say certain
+# things in its copy — a conformity verdict ("barrierefrei"), a legal
+# guarantee ("rechtssicher"), a health claim, a financial promise, a
+# "kostenlos" that is not. A reviewer misses one sentence long before a
+# check does, so list the phrases here and the gate fails on every
+# occurrence. THE TEMPLATE SHIPS AN EMPTY LIST; each clone fills its own.
+#
+# What is scanned: the i18n JSON of `apps/app` (`apps/app/lib/i18n`) and the
+# website's copy (`apps/website/lib/src/{i18n,pages,components}`, Dart
+# string literals), plus every file or directory under `sources:` below
+# (relative to the repo root; e.g. email templates or generated documents).
+# JSON is scanned by value, never by key; `.g.dart` files are skipped.
+#
+# How phrases match: whole words only, case-insensitively, with the German
+# letters folded (`Ä`/`ä`, `ß`/`ss`, `ü`/`ue` are all equal) — so
+# "barrierefrei" matches "Das ist BARRIEREFREI." but not "Barrierefreiheit".
+# Spaces match any whitespace. A trailing `*` lets the last word take any
+# ending, for German inflections: "barrierefrei*" also matches
+# "barrierefreie", "barrierefreier" and "Barrierefreiheit".
+#
+# Exceptions: a sentence that legitimately contains a phrase — typically
+# one that negates it ("Dies ist kein BITV-Test") — is recorded with the
+# exact sentence (sentences end at . ! ? or a line break; whitespace is
+# normalised), a reason and the date. An exception covers that phrase in
+# that sentence only; edit the sentence and the gate refuses it again.
+# Every exception is printed on every run, like `licence-exceptions.yaml`.
+#
+# phrases:
+#   - rechtssicher
+#   - "barrierefrei*"
+# sources:
+#   - apps/app/assets/email_templates
+# exceptions:
+#   - phrase: barrierefrei
+#     sentence: "Diese Seite ist nicht barrierefrei zertifiziert."
+#     reason: "Negates the claim; legal reviewed it."
+#     date: "2026-01-31"
+phrases: []
+sources: []
+exceptions: []

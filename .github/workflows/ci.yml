@@ -1,0 +1,136 @@
+# Verification only (see separate-verification-from-deployment.md) — no
+# deployment step in this file. Runs on a GitHub-hosted Linux runner
+# (kept as a single, repeated `runs-on:` value in every workflow file, so
+# swapping the runner provider is a one-line change per file; prerequisites
+# are in `.github/RUNNER.md`). Toolchain: `.github/actions/setup`.
+#
+# The nine quick checks — `format`, `analyze`, `test`, `map-check`,
+# `licence-check`, `changelog-check`, `phrase-check`, `branch-lint`,
+# `lint-history` — used to be separate workflows,
+# each with its own checkout and Flutter setup for a check that often takes
+# under a minute. They are now steps of ONE job with ONE checkout/setup.
+# Every check step after setup carries `if: !cancelled() && setup succeeded`,
+# so one failing check never hides the others' results, while the job still
+# fails overall. Each step is named after its check, so a failure shows by
+# name.
+#
+# Two checks are deliberately not steps of this job. `check-generated`
+# is covered by `gen-fresh-check` (its own workflow), which regenerates
+# everything from a clean clone and compares it with HEAD; the melos script
+# stays for local use. `docs-check` is the slowest quick check (dartdoc per
+# package) and no dartdoc flag makes it cheaper, so it is its own workflow
+# (`docs-check.yml`, same triggers) and runs in parallel with this job on
+# another runner.
+#
+# Triggers: `pull_request`, and `push` only to the two long-lived
+# branches — a push to a PR branch is already covered by that PR's
+# `pull_request` run, so it never runs twice. The concurrency group cancels
+# a superseded PR run (a stale run still takes runner minutes a fresh
+# one needs); runs on `development`/`production` are never cancelled.
+#
+# Checkout: the actual source branch (`head_ref` for a PR, `ref_name` for a
+# push), not the default `pull_request` checkout of the synthetic
+# `refs/pull/<n>/merge` commit — `lint-history` would fail on that merge
+# commit's own subject, and `branch-lint` must see the branch name that was
+# really pushed. `branch-lint` here passes `--branch` and lints only the
+# pushed branch's own name, never the refs in the workspace. A full audit is what `melos run branch-lint` locally is for.
+# `lint-history` walks every commit reachable from HEAD, so its step
+# deepens the shallow clone first (only that one branch's history).
+
+name: ci
+
+on:
+  push:
+    branches: [development, production]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      # `melos run test` exercises real `git merge`/`git commit` through
+      # test/support/git_fixture.dart, which needs a committer identity the
+      # CI user has none of. Env vars, so no git config is ever touched.
+      GIT_AUTHOR_NAME: GitHub Actions CI
+      GIT_AUTHOR_EMAIL: ci@example.com
+      GIT_COMMITTER_NAME: GitHub Actions CI
+      GIT_COMMITTER_EMAIL: ci@example.com
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - uses: ./.github/actions/setup
+        id: setup
+
+      # `gen:build_runner` recompiles build_runner's builder snapshot from
+      # scratch on every cold checkout, and checkout wipes `.dart_tool`, so
+      # this cache is worth it. Keyed on
+      # `pubspec.lock` + every `build.yaml`; a miss only costs time.
+      - name: Cache build_runner snapshots
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            core/design/ui/.dart_tool/build/entrypoint
+            core/design/tokens_builder/.dart_tool/build/entrypoint
+            packages/domain/.dart_tool/build/entrypoint
+            apps/app/.dart_tool/build/entrypoint
+            apps/website/.dart_tool/build/entrypoint
+          key: build-runner-${{ hashFiles('pubspec.lock', '**/build.yaml') }}
+
+      - name: format
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: dart run melos run format
+
+      # One analysis server for the whole workspace (root pubspec.yaml's
+      # `analyze`): a per-package fan-out ran out of memory.
+      - name: analyze
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: dart run melos run analyze
+
+      - name: test
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: |
+          git --version
+          dart run melos run test
+
+      - name: map-check
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: dart run melos run map-check
+
+      # Needs outbound access to pub.dev's score API (see
+      # `core/tooling/tooling/lib/src/pub_dev_licence_client.dart`).
+      - name: licence-check
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: dart run melos run licence-check
+
+      - name: changelog-check
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: dart run melos run changelog-check
+
+      - name: phrase-check
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: dart run melos run phrase-check
+
+      - name: branch-lint
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        env:
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: dart run tooling:branch_lint --branch "$BRANCH"
+
+      # Invoked directly via `dart run tooling:lint_history`, not a melos
+      # script (see CLAUDE.md).
+      - name: lint-history
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        env:
+          SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
+            git fetch --no-tags --unshallow origin "$SOURCE_BRANCH"
+          fi
+          dart run tooling:lint_history

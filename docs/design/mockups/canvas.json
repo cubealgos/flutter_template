@@ -1,0 +1,388 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "AccountSettings-desktop-dark.dc.html": {
+      "h": 800,
+      "title": "Account settings · desktop · dark",
+      "w": 1280,
+      "x": 940,
+      "y": 12028
+    },
+    "AccountSettings-phone-dark.dc.html": {
+      "h": 900,
+      "title": "Account settings · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 12028
+    },
+    "AccountSettings-phone-light.dc.html": {
+      "h": 900,
+      "title": "Account settings · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 12028
+    },
+    "BlockedVersion-phone-dark.dc.html": {
+      "h": 780,
+      "title": "Blocked-version screen · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 15212
+    },
+    "BlockedVersion-phone-light.dc.html": {
+      "h": 780,
+      "title": "Blocked-version screen · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 15212
+    },
+    "Consent-phone-dark.dc.html": {
+      "h": 800,
+      "title": "Consent sheet · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 2260
+    },
+    "Consent-phone-light.dc.html": {
+      "h": 800,
+      "title": "Consent sheet · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 2260
+    },
+    "DeleteAccountDialog-phone-dark.dc.html": {
+      "h": 844,
+      "title": "Delete-account confirmation · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 13308
+    },
+    "DeleteAccountDialog-phone-light.dc.html": {
+      "h": 844,
+      "title": "Delete-account confirmation · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 13308
+    },
+    "Home-desktop-dark.dc.html": {
+      "h": 800,
+      "title": "Home (empty state) · desktop · dark",
+      "w": 1280,
+      "x": 940,
+      "y": 4380
+    },
+    "Home-phone-dark.dc.html": {
+      "h": 844,
+      "title": "Home (empty state) · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 4380
+    },
+    "Home-phone-light.dc.html": {
+      "h": 844,
+      "title": "Home (empty state) · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 4380
+    },
+    "LegalDocument-desktop-dark.dc.html": {
+      "h": 900,
+      "title": "Legal document (Impressum) · desktop · dark",
+      "w": 1280,
+      "x": 940,
+      "y": 8428
+    },
+    "LegalDocument-phone-dark.dc.html": {
+      "h": 1020,
+      "title": "Legal document (Impressum) · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 8428
+    },
+    "LegalDocument-phone-light.dc.html": {
+      "h": 1020,
+      "title": "Legal document (Impressum) · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 8428
+    },
+    "LegalHub-phone-dark.dc.html": {
+      "h": 820,
+      "title": "Legal hub · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 7488
+    },
+    "LegalHub-phone-light.dc.html": {
+      "h": 820,
+      "title": "Legal hub · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 7488
+    },
+    "Licences-phone-dark.dc.html": {
+      "h": 860,
+      "title": "Licences · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 9568
+    },
+    "Licences-phone-light.dc.html": {
+      "h": 860,
+      "title": "Licences · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 9568
+    },
+    "Main.dc.html": {
+      "h": 920,
+      "title": "Sign in (email) · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 260
+    },
+    "Onboarding-phone-dark.dc.html": {
+      "x": 0,
+      "y": 3440,
+      "w": 390,
+      "h": 820,
+      "title": "Onboarding · 1 Profile · phone · dark"
+    },
+    "Onboarding-phone-light.dc.html": {
+      "x": 470,
+      "y": 3440,
+      "w": 390,
+      "h": 820,
+      "title": "Onboarding · 1 Profile · phone · light"
+    },
+    "PaywallStub-phone-dark.dc.html": {
+      "h": 820,
+      "title": "Paywall (stub) · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 14272
+    },
+    "PaywallStub-phone-light.dc.html": {
+      "h": 820,
+      "title": "Paywall (stub) · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 14272
+    },
+    "PermissionPrePrompt-phone-dark.dc.html": {
+      "h": 844,
+      "title": "Permission pre-prompt · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 5344
+    },
+    "PermissionPrePrompt-phone-light.dc.html": {
+      "h": 844,
+      "title": "Permission pre-prompt · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 5344
+    },
+    "PrivacySettings-desktop-dark.dc.html": {
+      "h": 900,
+      "title": "Privacy settings (export result) · desktop · dark",
+      "w": 1280,
+      "x": 940,
+      "y": 10548
+    },
+    "PrivacySettings-phone-dark.dc.html": {
+      "h": 1360,
+      "title": "Privacy settings (export result) · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 10548
+    },
+    "PrivacySettings-phone-light.dc.html": {
+      "h": 1360,
+      "title": "Privacy settings (export result) · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 10548
+    },
+    "SettingsHub-desktop-dark.dc.html": {
+      "h": 800,
+      "title": "Settings hub · desktop · dark",
+      "w": 1280,
+      "x": 940,
+      "y": 6568
+    },
+    "SettingsHub-phone-dark.dc.html": {
+      "h": 780,
+      "title": "Settings hub · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 6568
+    },
+    "SettingsHub-phone-light.dc.html": {
+      "h": 780,
+      "title": "Settings hub · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 6568
+    },
+    "SignInCode-error-phone-dark.dc.html": {
+      "h": 840,
+      "title": "Sign in (code, error) · phone · dark",
+      "w": 390,
+      "x": 940,
+      "y": 1300
+    },
+    "SignInCode-phone-dark.dc.html": {
+      "h": 800,
+      "title": "Sign in (code) · phone · dark",
+      "w": 390,
+      "x": 0,
+      "y": 1300
+    },
+    "SignInCode-phone-light.dc.html": {
+      "h": 800,
+      "title": "Sign in (code) · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 1300
+    },
+    "SignInEmail-desktop-dark.dc.html": {
+      "h": 800,
+      "title": "Sign in (email) · desktop · dark",
+      "w": 1280,
+      "x": 940,
+      "y": 260
+    },
+    "SignInEmail-phone-light.dc.html": {
+      "h": 920,
+      "title": "Sign in (email) · phone · light",
+      "w": 390,
+      "x": 470,
+      "y": 260
+    },
+    "OnboardingPreferences-phone-dark.dc.html": {
+      "x": 940,
+      "y": 3440,
+      "w": 390,
+      "h": 820,
+      "title": "Onboarding · 2 Preferences · phone · dark"
+    },
+    "OnboardingPreferences-phone-light.dc.html": {
+      "x": 1410,
+      "y": 3440,
+      "w": 390,
+      "h": 820,
+      "title": "Onboarding · 2 Preferences · phone · light"
+    },
+    "OnboardingNotifications-phone-dark.dc.html": {
+      "x": 1880,
+      "y": 3440,
+      "w": 390,
+      "h": 820,
+      "title": "Onboarding · 3 Notifications · phone · dark"
+    },
+    "OnboardingNotifications-phone-light.dc.html": {
+      "x": 2350,
+      "y": 3440,
+      "w": 390,
+      "h": 820,
+      "title": "Onboarding · 3 Notifications · phone · light"
+    },
+    "Onboarding-desktop-dark.dc.html": {
+      "x": 2820,
+      "y": 3440,
+      "w": 1280,
+      "h": 800,
+      "title": "Onboarding · 1 Profile · desktop · dark"
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-25T12:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "n1": {
+      "kind": "title1",
+      "maxW": 2220,
+      "text": "Sign-in & consent",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "n2": {
+      "kind": "title1",
+      "maxW": 4100,
+      "text": "First run",
+      "w": 240,
+      "x": 0,
+      "y": 3180
+    },
+    "n3": {
+      "kind": "title1",
+      "maxW": 2220,
+      "text": "Settings & legal",
+      "w": 240,
+      "x": 0,
+      "y": 6308
+    },
+    "n4": {
+      "kind": "title1",
+      "maxW": 860,
+      "text": "Edge states",
+      "w": 240,
+      "x": 0,
+      "y": 13048
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "SignInEmail-phone-light.dc.html",
+    "SignInEmail-desktop-dark.dc.html",
+    "SignInCode-phone-dark.dc.html",
+    "SignInCode-phone-light.dc.html",
+    "SignInCode-error-phone-dark.dc.html",
+    "Consent-phone-dark.dc.html",
+    "Consent-phone-light.dc.html",
+    "Onboarding-phone-dark.dc.html",
+    "Onboarding-phone-light.dc.html",
+    "OnboardingPreferences-phone-dark.dc.html",
+    "OnboardingPreferences-phone-light.dc.html",
+    "OnboardingNotifications-phone-dark.dc.html",
+    "OnboardingNotifications-phone-light.dc.html",
+    "Onboarding-desktop-dark.dc.html",
+    "Home-phone-dark.dc.html",
+    "Home-phone-light.dc.html",
+    "Home-desktop-dark.dc.html",
+    "PermissionPrePrompt-phone-dark.dc.html",
+    "PermissionPrePrompt-phone-light.dc.html",
+    "SettingsHub-phone-dark.dc.html",
+    "SettingsHub-phone-light.dc.html",
+    "SettingsHub-desktop-dark.dc.html",
+    "LegalHub-phone-dark.dc.html",
+    "LegalHub-phone-light.dc.html",
+    "LegalDocument-phone-dark.dc.html",
+    "LegalDocument-phone-light.dc.html",
+    "LegalDocument-desktop-dark.dc.html",
+    "Licences-phone-dark.dc.html",
+    "Licences-phone-light.dc.html",
+    "PrivacySettings-phone-dark.dc.html",
+    "PrivacySettings-phone-light.dc.html",
+    "PrivacySettings-desktop-dark.dc.html",
+    "AccountSettings-phone-dark.dc.html",
+    "AccountSettings-phone-light.dc.html",
+    "AccountSettings-desktop-dark.dc.html",
+    "DeleteAccountDialog-phone-dark.dc.html",
+    "DeleteAccountDialog-phone-light.dc.html",
+    "PaywallStub-phone-dark.dc.html",
+    "PaywallStub-phone-light.dc.html",
+    "BlockedVersion-phone-dark.dc.html",
+    "BlockedVersion-phone-light.dc.html"
+  ],
+  "pages": [],
+  "title": "flutter_template app screens"
+}

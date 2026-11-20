@@ -1,0 +1,26 @@
+flutter_template
+Copyright 2026 Cube Algos UG (haftungsbeschränkt)
+
+This distribution includes software developed for the flutter_template
+project, licensed under the Apache License, Version 2.0 — see LICENSE.
+
+--------------------------------------------------------------------------
+
+A clone owns its copy outright: replace the copyright line above with
+your own legal entity before you ship. `tooling:rename` does not rewrite
+this file (see the root `README.md`'s "After cloning" checklist).
+
+No third-party dependency in this workspace's `pubspec.lock` currently
+ships its own NOTICE file requiring propagation under Apache License
+§4(d) — checked against each hosted dependency's pub.dev-reported licence
+via `melos run licence-check`
+(`core/tooling/tooling/lib/src/licence_check_command.dart`, policy in
+`licence_policy.dart`). That gate verifies licence identifiers, not NOTICE
+propagation specifically — re-check by hand if a new Apache-2.0-licensed
+dependency with its own NOTICE file is added.
+
+A third-party licence bundle (reproducing each dependency's own licence
+text, a separate obligation from this NOTICE file under MIT/BSD-style
+licences) is owed at the first redistributed build artifact, not at
+source-availability time — see `docs/releasing.md`'s security-gate
+checklist (SBOM), which this template does not yet build.

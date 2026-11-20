@@ -1,0 +1,58 @@
+# Keyed exceptions and verified-detection-gap overrides for
+# `melos run licence-check` (core/tooling/tooling's `licence_check`, see
+# docs/map/tooling.md; CI row is in CLAUDE.md's Toolchain paragraph — kept
+# at 60 lines, don't add to it for changes here).
+#
+# `exceptions:` — every entry is a deliberate, per-package call — never a
+# blanket allowance — keyed on BOTH `package` and `licence` together, so a
+# relicense of the package (a different licence than the one recorded
+# here) makes the entry stop matching and the gate re-refuses it. Printed
+# in full on every `licence-check` run; see
+# `core/tooling/tooling/lib/src/licence_policy.dart` for the policy this
+# enforces; the reasoning behind any exception is recorded on its entry.
+#
+# `verified:` — a *different* kind of entry: pub.dev's own detector
+# sometimes finds nothing at all (empty/`unknown`/unrecognised `license:`
+# tags) for a package whose LICENSE file is actually fine — a detection
+# gap, not a policy call. This never overrides a licence pub.dev *did*
+# detect, and only applies when the resolved version matches exactly (an
+# upgrade re-refuses until someone reads the new LICENSE and records a
+# fresh entry); the recorded `licence` still has to clear the allow list
+# itself — a "verified" GPL stays denied. Also printed in full on every
+# run.
+#
+# Every hosted dependency this
+# workspace's own resolved graph pulls in that pub.dev *can* classify is
+# exclusively MIT / Apache-2.0 / BSD-2-Clause / BSD-3-Clause as of this writing —
+# verified by hand against pub.dev's score API for every hosted package.
+#
+# One entry is recorded for a non-pub asset, `axe-core` (see below): the
+# checker only walks `pubspec.lock`, so it never matches anything there; the
+# entry is the written record the policy asks for.
+#
+# exceptions:
+#   - package: some_package
+#     licence: MPL-2.0
+#     reason: "Why this is safe — see the policy document's own entries
+#       for the shape this reasoning should take."
+#     scope: dev
+exceptions:
+  - package: axe-core
+    licence: MPL-2.0
+    reason: >-
+      Vendored unmodified at core/tooling/tooling/third_party/axe-core/
+      (version and SHA-256 pinned in web_smoke_axe.dart) and injected by
+      `tooling:web_smoke` into a headless browser to check the web build's
+      semantics DOM. MPL-2.0 is file-level copyleft: the file is not
+      modified and never linked into or shipped with an app, the website or
+      any release artifact, so no obligation attaches to our code.
+    scope: dev
+
+verified:
+  - package: html
+    version: 0.15.7
+    licence: MIT
+    reason: >-
+      pub.dev reports license:unknown; LICENSE file is the verbatim MIT
+      text after a contributor list (read 2026-09-24); transitive
+      dev-only via package_rename.

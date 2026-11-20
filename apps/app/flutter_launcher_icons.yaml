@@ -1,0 +1,43 @@
+# flutter_launcher_icons (MIT, fluttercommunity/flutter_launcher_icons, pinned in pubspec.yaml)
+# regenerates every platform launcher icon from apps/app/assets/icon/*.png (see that directory's
+# README.md for the source-image requirements). Run via `dart run melos run icons`
+# (core/tooling/tooling's `icons` command), never by hand — that command also fills the gaps this
+# tool leaves: favicon.ico, apple-touch-icon.png, the Linux icon + .desktop entry, and idempotent
+# web/index.html link-tag patching (this tool covers Android, iOS, macOS, Windows and the rest of
+# web: favicon.png, Icon-192/512.png, Icon-192/512-maskable.png, and manifest.json's icons array
+# — confirmed against its lib/web/web_icon_generator.dart source, since the README doesn't list
+# exact filenames).
+flutter_launcher_icons:
+  image_path: "assets/icon/icon.png"
+
+  android: true
+  adaptive_icon_background: "#1d6fe0"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  adaptive_icon_monochrome: "assets/icon/icon_monochrome.png"
+
+  ios: true
+  # Apple rejects an App Store icon with an alpha channel; icon.png is
+  # already opaque (see assets/icon/README.md) but this makes the tool
+  # enforce it regardless of what a replacement source image carries.
+  remove_alpha_ios: true
+
+  macos:
+    generate: true
+    image_path: "assets/icon/icon.png"
+
+  windows:
+    generate: true
+    image_path: "assets/icon/icon.png"
+    icon_size: 48
+
+  web:
+    generate: true
+    image_path: "assets/icon/icon.png"
+    # core/design/ui/tokens/color.light.json: color.paper (page background)
+    # and color.accent (primary/focal) — see that file for the full token
+    # set. Kept as literal hex here (not read from the JSON at generation
+    # time) because flutter_launcher_icons' own config format takes a
+    # plain string; core/design/tokens_builder only feeds Dart code, not this
+    # tool's yaml.
+    background_color: "#f5f5f5"
+    theme_color: "#1d6fe0"

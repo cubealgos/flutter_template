@@ -1,0 +1,51 @@
+name: api
+description: >-
+  Appwrite Function: the one `api` action router. Authenticates the caller,
+  dispatches `{"action": "...", ...}` to a registered action (delete_account,
+  review_demo_sign_in, team_admin, ...) and maps errors; also runs scheduled jobs on the
+  cron tick. Deployed with `dart run bin/deploy.dart api` from
+  `backend/appwrite/tool/`.
+publish_to: none
+resolution: workspace
+
+environment:
+  # Deliberately below the workspace's own ^3.13.0 (see root pubspec.yaml):
+  # Appwrite Cloud's newest Dart function runtime is `dart-3.12`, and the
+  # deployed bundle must compile under the runtime's SDK. One runtime for
+  # Cloud and the local stack (see backend/appwrite/README.md).
+  sdk: ^3.12.0
+
+dependencies:
+  appwrite_schema:
+    path: ../../schema
+  # The billing contract (ledger, engine, reconciler) and its Paddle adapter.
+  billing:
+    path: ../../../../core/contracts/billing
+  # BSD-3-Clause (dart.dev): HMAC-SHA-256 for `RateLimiter`'s key hashes.
+  crypto: ^3.0.7
+  dart_appwrite: ^29.0.0
+  domain:
+    path: ../../../../packages/domain
+  # BSD-3-Clause (dart.dev): the HTTP client of the Paddle API calls.
+  http: ^1.2.2
+  # `TeamEngine` and the team models: the `team_admin` action runs the same
+  # rules the fake does. SDK floor ^3.12.0, like this package.
+  jobs:
+    path: ../../../../core/contracts/jobs
+  # MIT (pub.dev, verified 2026-10-02; its transitive packages async, crypto,
+  # intl, logging, meta, mime, path, punycoder and unorm_dart are MIT or
+  # BSD-3-Clause). Direct SMTP for the mail Appwrite Messaging cannot send:
+  # it has no way to set `List-Unsubscribe`.
+  mailer: ^7.2.0
+  mailing:
+    path: ../../../../core/contracts/mailing
+  paddle_billing:
+    path: ../../../paddle
+  teams:
+    path: ../../../../core/contracts/teams
+
+dev_dependencies:
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0

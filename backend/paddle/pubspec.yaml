@@ -1,0 +1,32 @@
+name: paddle_billing
+description: >-
+  The Paddle Billing adapter (the template's default merchant of record) for
+  `core/contracts/billing`: the `Paddle-Signature` verification, the webhook
+  event parser, the API client (checkout, prorated quantity updates, customer
+  portal sessions, subscription reads) and `BillingService`, the server-side
+  implementation of the operations. Pure Dart; runs inside the
+  `api` and `hooks` Appwrite Functions.
+publish_to: none
+resolution: workspace
+
+environment:
+  # Deliberately below the workspace's own ^3.13.0 (see root pubspec.yaml):
+  # the Appwrite Functions depend on this package and build on Appwrite
+  # Cloud's `dart-3.12` runtime.
+  sdk: ^3.12.0
+
+dependencies:
+  billing:
+    path: ../../core/contracts/billing
+  # BSD-3-Clause (dart.dev): HMAC-SHA-256 for the webhook signature and
+  # SHA-256 for the body hash.
+  crypto: ^3.0.7
+  # BSD-3-Clause (dart.dev): the Paddle API client; `MockClient` fakes it in
+  # tests.
+  http: ^1.2.2
+
+dev_dependencies:
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0

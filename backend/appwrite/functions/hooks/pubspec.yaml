@@ -1,0 +1,34 @@
+name: hooks
+description: >-
+  Appwrite Function: the one `hooks` receiver of public, unauthenticated
+  inbound webhooks. Each hook verifies its own signature over the
+  exact raw request body and is routed by path (`/paddle`). Deployed with
+  `dart run bin/deploy.dart hooks` from `backend/appwrite/tool/`. It is the
+  only code that writes the billing ledger.
+publish_to: none
+resolution: workspace
+
+environment:
+  # Deliberately below the workspace's own ^3.13.0 (see root pubspec.yaml):
+  # Appwrite Cloud's newest Dart function runtime is `dart-3.12`, and the
+  # deployed bundle must compile under the runtime's SDK.
+  sdk: ^3.12.0
+
+dependencies:
+  # The Appwrite stores billing runs on (`package:api/billing_stores.dart`),
+  # shared with the `api` router so the ledger has one implementation.
+  api:
+    path: ../api
+  appwrite_schema:
+    path: ../../schema
+  billing:
+    path: ../../../../core/contracts/billing
+  dart_appwrite: ^29.0.0
+  paddle_billing:
+    path: ../../../paddle
+
+dev_dependencies:
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0

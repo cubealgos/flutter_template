@@ -1,0 +1,1380 @@
+/*
+ * apps/website — hand-authored layout/component CSS.
+ *
+ * Every colour, space, radius, type-size, font-family and motion value
+ * used below comes from a `var(--...)` custom property in tokens.g.css
+ * (generated from core/design/ui/tokens/*.json — see that file's own header
+ * comment). Never hard-code a value tokens.g.css already declares.
+ *
+ * Square corners throughout (reaffirmed): no `border-radius`
+ * on any rectangular container, button or card — the one deliberate
+ * exception is a true circle (the proof badge's status dot). This site has
+ * no `--chamfer`/`--chamfer-sm` clip-path notches at all — the reference site's
+ * chamfer vocabulary was dropped, not renamed; anywhere the reference site used a
+ * clip-path notch this site uses a plain square edge instead ("squares
+ * instead of chamfers").
+ */
+
+/* ============================================================ FONTS
+ * Self-hosted — served from this site's own origin, never a
+ * CDN. See tool/font-licences.md for the licence record and provenance.
+ * `font-display: swap` so text renders in a fallback face immediately and
+ * swaps in once the woff2 has loaded, rather than staying invisible. */
+@font-face {
+  font-family: "Host Grotesk";
+  src: url("fonts/host-grotesk/HostGrotesk-wght.woff2") format("woff2-variations"),
+    url("fonts/host-grotesk/HostGrotesk-wght.woff2") format("woff2");
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: var(--color-bg);
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-family-body);
+  font-size: var(--product-body);
+  line-height: 1.6;
+  /* `anywhere`, not `break-word`: `break-word` lets a long unbroken word
+   * (a German compound noun, easily 20+ characters with no hyphenation
+   * opportunity) wrap visually, but it does NOT reduce the min-content
+   * width the browser uses to size a flex/grid item — so the hero column,
+   * a feature card or the nav brand link still demanded room for the
+   * whole word and forced the page wider than the viewport. `anywhere`
+   * is the one value that also shrinks that intrinsic sizing, which is
+   * what actually fixes horizontal overflow at narrow widths (the same
+   * fix applies to any long unbroken word). */
+  overflow-wrap: anywhere;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-family-title);
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+a {
+  color: inherit;
+}
+
+/* Accessible focus ring (AA/non-text-contrast) — a normal positive-offset
+ * outline works fine (no clip-path on this site to clip it; a
+ * negative-offset workaround is only needed where chamfer clip-paths exist). */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Skip link — visually hidden until focused, the first focusable element
+ * on every page (accessibility acceptance criterion). */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-4);
+  z-index: 100;
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.skip-link:focus {
+  top: var(--space-4);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================ NAV */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: color-mix(in srgb, var(--color-bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: var(--stroke-default) solid var(--color-border);
+}
+.site-nav__inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: var(--space-3) var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2) var(--space-6);
+  /* Wraps to further lines rather than overflowing at narrow widths
+   * (320-390px) — the brand link, the section links, the language
+   * switcher and the CTA button together don't fit on one line. */
+  flex-wrap: wrap;
+}
+@media (min-width: 768px) {
+  .site-nav__inner {
+    padding-inline: var(--space-16);
+  }
+}
+.site-nav__brand {
+  font-family: var(--font-family-title);
+  font-size: var(--product-h2);
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--color-fg);
+}
+.site-nav__links {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .site-nav__links {
+    display: flex;
+  }
+  .site-nav__links ul {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .site-nav__links a {
+    font-size: var(--product-body-sm);
+    color: var(--color-fg);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: var(--space-2);
+  }
+  .site-nav__links a:hover,
+  .site-nav__links a:focus-visible {
+    color: var(--color-link);
+  }
+}
+/* Groups the language switcher and CTA on the nav's right side — a single flex item so `margin-left: auto`
+ * pushes both together, and so they wrap to their own line as one unit
+ * rather than the switcher and button ending up on separate lines.
+ * Hidden below `1024px` the
+ * switcher, the CTA and the mobile toggle together no longer fit on one
+ * header row at narrow widths (measured overflow at 390px) — below this
+ * breakpoint both move into `.nav-overlay` instead (see `site_nav.dart`'s
+ * own `_overlay`), leaving only the brand and the toggle on the row. */
+.site-nav__actions {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .site-nav__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-left: auto;
+  }
+}
+.site-nav__lang {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-family-mono);
+  font-size: var(--product-body-sm);
+  color: var(--color-fg-subtle);
+}
+.site-nav__lang a {
+  text-decoration: none;
+  color: var(--color-fg-subtle);
+  padding: var(--space-1);
+}
+.site-nav__lang a[aria-current='true'] {
+  color: var(--color-link);
+}
+.site-nav__lang a:hover,
+.site-nav__lang a:focus-visible {
+  color: var(--color-link);
+}
+.site-nav__cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: var(--space-4);
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: var(--product-body-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color var(--motion-duration-fast) var(--motion-easing-standard);
+}
+.site-nav__cta:hover,
+.site-nav__cta:focus-visible {
+  background-color: var(--color-link);
+}
+
+/* Mobile nav toggle — a square icon button (no chamfer) shown only below
+ * the `.site-nav__links` breakpoint, where the inline section links are
+ * hidden; opens `.nav-overlay` below. Two stacked glyphs (menu/close),
+ * one hidden by `[aria-expanded]` rather than swapped via JS text
+ * content — see `web/motion.js`'s `initNavToggle`. */
+.site-nav__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  /* `.site-nav__actions` is the flex item that normally carries this
+   * `margin-left: auto` (pushing itself to the row's right edge), but
+   * it's `display: none` below `1024px` — the toggle needs its own copy
+   * so it still lands on the right rather than sitting right after the
+   * brand. Harmless at `>=1024px`: the toggle itself is `display: none`
+   * there (see the breakpoint below). */
+  margin-left: auto;
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+  border: none;
+  cursor: pointer;
+  font-size: var(--product-h2);
+  line-height: 1;
+}
+.site-nav__toggle-icon--close {
+  display: none;
+}
+.site-nav__toggle[aria-expanded='true'] .site-nav__toggle-icon--menu {
+  display: none;
+}
+.site-nav__toggle[aria-expanded='true'] .site-nav__toggle-icon--close {
+  display: inline;
+}
+@media (min-width: 1024px) {
+  .site-nav__toggle {
+    display: none;
+  }
+}
+
+/* Full-viewport mobile nav overlay — matches `.site-nav`'s own blurred-glass
+ * chrome so the two chrome surfaces read as one consistent system. Hidden
+ * (opacity/visibility, not `display: none`) so its own `transition` can
+ * animate the open/close, matching the reveal system's own visibility
+ * pattern rather than a second, different mechanism. */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  background-color: color-mix(in srgb, var(--color-bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--motion-duration-default) var(--motion-easing-standard),
+    visibility 0s var(--motion-duration-default);
+}
+.nav-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--motion-duration-default) var(--motion-easing-standard),
+    visibility 0s;
+}
+.nav-overlay__links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+}
+.nav-overlay__links a {
+  font-family: var(--font-family-title);
+  font-size: var(--product-hero-1);
+  color: var(--color-fg);
+  text-decoration: none;
+}
+.nav-overlay__links a:hover,
+.nav-overlay__links a:focus-visible {
+  color: var(--color-link);
+}
+/* The language switcher moved here from `.site-nav__actions` (hidden
+ * below `1024px`, see that rule's own comment) — same link pair, sized
+ * for the overlay's larger touch targets rather than the inline header's
+ * compact ones. */
+.nav-overlay__lang {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-family-mono);
+  font-size: var(--product-body);
+  color: var(--color-fg-subtle);
+}
+.nav-overlay__lang a {
+  text-decoration: none;
+  color: var(--color-fg-subtle);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+}
+.nav-overlay__lang a[aria-current='true'] {
+  color: var(--color-link);
+}
+.nav-overlay__lang a:hover,
+.nav-overlay__lang a:focus-visible {
+  color: var(--color-link);
+}
+.nav-overlay__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: var(--space-6);
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: var(--product-button);
+  font-weight: 600;
+  text-decoration: none;
+}
+.nav-overlay__close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+  border: none;
+  cursor: pointer;
+  font-size: var(--product-h2);
+}
+@media (min-width: 1024px) {
+  .nav-overlay {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-overlay {
+    transition: none;
+  }
+}
+
+/* ============================================================ HERO */
+.hero {
+  position: relative;
+  padding-block: var(--space-24);
+  overflow: hidden;
+}
+.hero__inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  align-items: center;
+}
+@media (min-width: 768px) {
+  .hero__inner {
+    padding-inline: var(--space-16);
+  }
+}
+@media (min-width: 1024px) {
+  .hero__inner {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+}
+
+.hero__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+  position: relative;
+  z-index: 1;
+}
+.hero__eyebrow {
+  font-family: var(--font-family-body);
+  font-size: var(--product-eyebrow);
+  font-weight: 600;
+  color: var(--color-link);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+.hero__headline {
+  font-size: var(--product-hero-1);
+  color: var(--color-fg);
+  margin: 0;
+}
+@media (min-width: 768px) {
+  .hero__headline {
+    font-size: var(--product-hero-2);
+  }
+}
+@media (min-width: 1280px) {
+  .hero__headline {
+    font-size: var(--product-hero-3);
+  }
+}
+.hero__lede {
+  font-size: var(--product-lede);
+  line-height: 1.6;
+  color: var(--color-fg-subtle);
+  max-width: 46ch;
+  margin: 0;
+}
+.hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+.hero__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: var(--space-6);
+  font-size: var(--product-button);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color var(--motion-duration-fast) var(--motion-easing-standard),
+    border-color var(--motion-duration-fast) var(--motion-easing-standard),
+    color var(--motion-duration-fast) var(--motion-easing-standard);
+}
+.hero__cta--primary {
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+.hero__cta--primary:hover,
+.hero__cta--primary:focus-visible {
+  background-color: var(--color-link);
+}
+.hero__cta--secondary {
+  background-color: transparent;
+  color: var(--color-accent);
+  border: var(--stroke-default) solid var(--color-accent);
+}
+.hero__cta--secondary:hover,
+.hero__cta--secondary:focus-visible {
+  background-color: var(--color-accent-tint);
+  color: var(--color-link);
+}
+.hero__note {
+  font-size: var(--product-body-sm);
+  color: var(--color-fg-subtle);
+  margin: 0;
+}
+
+.hero__motif-area {
+  position: relative;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The reference site's decorative background motif is a large, low-opacity
+ * chamfer-ringed logo mark bleeding off the top/right edge; this site has
+ * no brand mark and no chamfer, so the same compositional idea (a large,
+ * quiet shape behind the diagram card) is three layered square OUTLINES
+ * instead ("squares instead of chamfers"). Outlined, not
+ * filled (no `background-color`): a filled rectangle read as a flat
+ * block rather than a cube-like motif ; a
+ * stack of bordered squares of decreasing size, one rotated, reads as
+ * depth instead. Purely decorative (`aria-hidden`), never text, never
+ * interactive. */
+.hero__shape {
+  position: absolute;
+  top: -12%;
+  right: -18%;
+  width: min(140%, 640px);
+  height: min(140%, 640px);
+  border: var(--stroke-strong) solid var(--color-accent);
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 0;
+}
+/* A second, smaller, rotated square outline layered inside the first —
+ * the reference site's own decorative motif is a multi-facet mark whose
+ * overlapping edges read as more than one flat shape; this is the
+ * square-cornered equivalent of that layering. */
+.hero__shape::before {
+  content: '';
+  position: absolute;
+  inset: 14%;
+  border: var(--stroke-default) solid var(--color-accent);
+  transform: rotate(8deg);
+}
+/* A third, innermost square outline, not rotated — the "closest" face of
+ * the stack, offset further in so the three squares read as receding
+ * layers rather than two shapes crossing at one point. A real DOM child
+ * (`hero.dart`'s own `.hero__shape-core`), not a third pseudo-element:
+ * `.hero__shape` already spends both of its own on the outer border and
+ * the rotated middle square. */
+.hero__shape-core {
+  position: absolute;
+  inset: 30%;
+  border: var(--stroke-default) solid var(--color-accent);
+}
+@media (min-width: 1024px) {
+  .hero__shape {
+    top: -20%;
+    right: -30%;
+    width: min(180%, 720px);
+    height: min(180%, 720px);
+  }
+}
+
+.hero__diagram {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  background-color: var(--color-surface);
+  border: var(--stroke-default) solid var(--color-border);
+  padding: var(--space-6);
+}
+.hero__diagram-caption {
+  font-family: var(--font-family-mono);
+  font-size: var(--product-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-fg-subtle);
+  margin: 0 0 var(--space-6);
+}
+.hero__diagram-flow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.hero__diagram-step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.hero__diagram-step:not(:first-child)::before {
+  content: '→';
+  color: var(--color-fg-subtle);
+  font-family: var(--font-family-mono);
+  flex-shrink: 0;
+  transition: opacity var(--motion-duration-slow) var(--motion-easing-standard);
+}
+/* The diagram's own steps get a distinct scale+fade sequence (not the
+ * generic translateY reveal used elsewhere), driven by the same
+ * `[data-reveal-group]` stagger mechanism (web/motion.js) so "Plan"
+ * appears, then "Build" and its arrow, then "Ship" and its arrow — the
+ * diagram visibly builds itself rather than fading in as one flat unit. */
+.hero__diagram-step[data-reveal] {
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity var(--motion-duration-slow) var(--motion-easing-standard),
+    transform var(--motion-duration-slow) var(--motion-easing-standard);
+}
+.hero__diagram-step[data-reveal].is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+.hero__diagram-step[data-reveal]:not(.is-visible)::before {
+  opacity: 0;
+}
+.hero__diagram-node {
+  flex: 1;
+  text-align: center;
+  background-color: var(--color-bg);
+  border: var(--stroke-default) solid var(--color-border);
+  padding: var(--space-3) var(--space-2);
+}
+.hero__diagram-node-label {
+  display: block;
+  font-size: var(--product-body-sm);
+  font-weight: 600;
+  color: var(--color-fg);
+}
+.hero__diagram-node-sub {
+  display: block;
+  font-family: var(--font-family-mono);
+  font-size: var(--product-caption);
+  text-transform: uppercase;
+  color: var(--color-fg-subtle);
+  margin-top: var(--space-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__cta {
+    transition: none;
+  }
+  .hero__diagram-step[data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .hero__diagram-step[data-reveal]::before {
+    opacity: 1;
+    transition: none;
+  }
+}
+
+/* ============================================================ FEATURES
+ * Shared by both landing-page bento grids ("what you get", "what we
+ * build" — see lib/src/components/feature_grid.dart). */
+.feature-section {
+  padding-block: var(--space-24);
+}
+.feature-section__inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+}
+@media (min-width: 768px) {
+  .feature-section__inner {
+    padding-inline: var(--space-16);
+  }
+}
+.feature-section__eyebrow {
+  font-family: var(--font-family-mono);
+  font-size: var(--product-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-fg-subtle);
+  margin: 0 0 var(--space-3);
+}
+.feature-section__heading {
+  font-size: var(--product-display);
+  color: var(--color-fg);
+  max-width: 36ch;
+  margin: 0 0 var(--space-6);
+}
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+@media (min-width: 768px) {
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .feature-grid {
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(180px, auto);
+  }
+}
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: inherit;
+  background-color: var(--color-surface);
+  border: var(--stroke-default) solid var(--color-border);
+  padding: var(--space-6);
+  transition:
+    transform var(--motion-duration-default) var(--motion-easing-standard),
+    border-color var(--motion-duration-default) var(--motion-easing-standard);
+}
+.feature-card--interactive {
+  border-width: var(--stroke-strong);
+  cursor: pointer;
+}
+.feature-card--interactive:hover,
+.feature-card--interactive:focus-visible {
+  transform: translateY(-4px);
+  border-color: var(--color-accent);
+}
+@media (min-width: 1024px) {
+  .feature-card--hero {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  .feature-card--wide {
+    grid-column: span 2;
+  }
+}
+.feature-card__title {
+  font-size: var(--product-h2);
+  line-height: 1.3;
+  color: var(--color-fg);
+}
+.feature-card--hero .feature-card__title {
+  font-size: var(--product-h1);
+}
+.feature-card__description {
+  font-size: var(--product-body-sm);
+  line-height: 1.6;
+  color: var(--color-fg-subtle);
+  margin: 0;
+}
+.feature-card__link {
+  font-size: var(--product-body-sm);
+  font-weight: 600;
+  color: var(--color-link);
+  margin-top: auto;
+  padding-top: var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-card {
+    transition: none;
+  }
+}
+
+/* ============================================================ PROOF
+ * Bug (a) fix: every section follows the theme — this one
+ * uses `--color-surface`, the same raised-card colour every other themed
+ * surface on the site uses, never a fixed literal colour that could read
+ * as "white in dark mode". */
+.proof-section {
+  padding-block: var(--space-24);
+  background-color: var(--color-surface);
+  border-block: var(--stroke-default) solid var(--color-border);
+}
+.proof-section__inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+}
+@media (min-width: 768px) {
+  .proof-section__inner {
+    padding-inline: var(--space-16);
+  }
+}
+@media (min-width: 1024px) {
+  .proof-section__inner {
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: start;
+  }
+}
+.proof-section__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.proof-section__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-family-mono);
+  font-size: var(--product-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-fg-subtle);
+  border: var(--stroke-default) solid var(--color-border);
+  padding: var(--space-2) var(--space-3);
+}
+.proof-section__badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-link);
+}
+.proof-section__heading {
+  font-size: var(--product-display);
+  color: var(--color-fg);
+  margin: 0;
+}
+.proof-section__body {
+  font-size: var(--product-body);
+  line-height: 1.6;
+  color: var(--color-fg-subtle);
+  max-width: 60ch;
+  margin: 0;
+}
+.proof-section__link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: var(--space-4);
+  margin-top: var(--space-2);
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: var(--product-body-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color var(--motion-duration-fast) var(--motion-easing-standard);
+}
+.proof-section__link:hover,
+.proof-section__link:focus-visible {
+  background-color: var(--color-link);
+}
+
+.proof-section__stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.proof-stat-card {
+  background-color: var(--color-bg);
+  border: var(--stroke-default) solid var(--color-border);
+  padding: var(--space-4);
+}
+.proof-stat-card__value {
+  font-family: var(--font-family-mono);
+  font-size: var(--product-h1);
+  font-weight: 600;
+  color: var(--color-fg);
+  margin: 0;
+}
+.proof-stat-card__label {
+  font-size: var(--product-body-sm);
+  color: var(--color-fg-subtle);
+  margin: var(--space-1) 0 0;
+}
+
+.proof-pills {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+}
+.proof-pill {
+  font-family: var(--font-family-mono);
+  font-size: var(--product-caption);
+  color: var(--color-fg-subtle);
+  background-color: var(--color-bg);
+  border: var(--stroke-default) solid var(--color-border);
+  padding: var(--space-1) var(--space-2);
+}
+
+/* ============================================================ PROCESS */
+.process-section {
+  padding-block: var(--space-24);
+}
+.process-section__inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+}
+@media (min-width: 768px) {
+  .process-section__inner {
+    padding-inline: var(--space-16);
+  }
+}
+.process-section__eyebrow {
+  font-family: var(--font-family-mono);
+  font-size: var(--product-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-fg-subtle);
+  margin: 0 0 var(--space-3);
+}
+.process-section__heading {
+  font-size: var(--product-display);
+  color: var(--color-fg);
+  max-width: 36ch;
+  margin: 0 0 var(--space-8);
+}
+.process-section__steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+@media (min-width: 480px) {
+  .process-section__steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .process-section__steps {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.process-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.process-step__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: var(--stroke-default) solid var(--color-border);
+  font-family: var(--font-family-mono);
+  font-size: var(--product-body-sm);
+  font-weight: 600;
+  color: var(--color-fg);
+}
+/* A connecting line draws in between steps, reinforcing the process as
+ * one continuous flow rather than four independent cards — only at
+ * `>=1024px`, where the grid is a single row (the same breakpoint the
+ * grid above switches to four columns at); a wrapped row has no single
+ * left-to-right line that would read correctly. Keyed off the same
+ * `.is-visible` class the reveal-group stagger already sets on the step
+ * itself, so the line draws in right as its own step's number appears. */
+@media (min-width: 1024px) {
+  .process-step:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    top: 13px;
+    left: calc(-1 * var(--space-6));
+    width: var(--space-6);
+    height: var(--stroke-default);
+    background-color: var(--color-border);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--motion-duration-slow) var(--motion-easing-standard);
+  }
+  .process-step[data-reveal].is-visible::before {
+    transform: scaleX(1);
+  }
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: reduce) {
+  .process-step:not(:first-child)::before {
+    transform: scaleX(1);
+    transition: none;
+  }
+}
+.process-step__title {
+  font-size: var(--product-h2);
+  color: var(--color-fg);
+}
+.process-step__body {
+  font-size: var(--product-body-sm);
+  line-height: 1.6;
+  color: var(--color-fg-subtle);
+  margin: 0;
+}
+
+/* ============================================================ FAQ */
+.faq-section {
+  padding-block: var(--space-24);
+}
+.faq-section__inner {
+  max-width: 46rem;
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+}
+@media (min-width: 768px) {
+  .faq-section__inner {
+    padding-inline: var(--space-16);
+  }
+}
+.faq-section__eyebrow {
+  font-family: var(--font-family-mono);
+  font-size: var(--product-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-fg-subtle);
+  margin: 0 0 var(--space-3);
+}
+.faq-section__heading {
+  font-size: var(--product-display);
+  color: var(--color-fg);
+  margin: 0 0 var(--space-6);
+}
+.faq-section__list {
+  display: flex;
+  flex-direction: column;
+}
+.faq-item {
+  border-bottom: var(--stroke-default) solid var(--color-border);
+  padding-block: var(--space-4);
+}
+.faq-item__question {
+  cursor: pointer;
+  font-family: var(--font-family-body);
+  font-weight: 600;
+  font-size: var(--product-body);
+  color: var(--color-fg);
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 44px;
+}
+.faq-item__question::-webkit-details-marker {
+  display: none;
+}
+/* A rotating chevron instead of an instant +/− content swap (content
+ * changes can't be transitioned; a transform can). Points down closed,
+ * up open. */
+.faq-item__question::after {
+  content: '⌄';
+  font-family: var(--font-family-mono);
+  color: var(--color-fg-subtle);
+  font-size: var(--product-h2);
+  flex-shrink: 0;
+  display: inline-block;
+  transition: transform var(--motion-duration-default) var(--motion-easing-standard);
+}
+/* Two conditions, not one: JS-driven opens toggle `.faq-item--expanded`
+ * in sync with the height animation (see `web/motion.js`'s
+ * `initFaqDisclosure`); the `[open]` fallback covers the no-JS/
+ * reduced-motion path, where the browser's own native instant toggle is
+ * the only thing that ever runs. */
+.faq-item[open] .faq-item__question::after,
+.faq-item--expanded .faq-item__question::after {
+  transform: rotate(180deg);
+}
+/* Height itself is animated by `web/motion.js` (WAAPI, since no CSS
+ * transition can animate a native `<details>` open/close toggle); this
+ * wrapper is what gets the animated height, kept separate from
+ * `.faq-item__answer` so its own margin isn't part of the measured/
+ * animated box. */
+.faq-item__answer-wrap {
+  overflow: hidden;
+}
+.faq-item__answer {
+  font-size: var(--product-body-sm);
+  line-height: 1.6;
+  color: var(--color-fg-subtle);
+  max-width: 60ch;
+  margin: var(--space-3) 0 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq-item__question::after {
+    transition: none;
+  }
+}
+
+/* ============================================================ CTA BAND
+ * Bug (a) fix: the band used `--color-ink` (a TEXT colour —
+ * near-white in dark mode, near-black in light) as a BACKGROUND, which
+ * read as a plain white band whenever the theme was dark. `accent-dark`
+ * is a themed section background in its own right — a deliberately dark,
+ * signal-tinted surface (the dark accent band, `--color-accent-dark`), the same
+ * value in both themes since it is meant to always read as "the ask",
+ * never to flip with the page theme. Its text is `on-fill` (fixed white
+ * in both themes — see core/design/ui/tokens/color.*.json), not the
+ * theme's own `ink`/`fg`, for the same reason. */
+.cta-section {
+  background-color: var(--color-accent-dark);
+  color: var(--color-on-fill);
+}
+.cta-section__inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: var(--space-16) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+@media (min-width: 640px) {
+  .cta-section__inner {
+    padding-inline: var(--space-16);
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+  }
+}
+.cta-section__heading {
+  font-size: var(--product-display);
+  color: var(--color-on-fill);
+  max-width: 30ch;
+  margin: 0;
+}
+.cta-section__body {
+  font-size: var(--product-body);
+  color: var(--color-on-fill);
+  max-width: 46ch;
+  margin: var(--space-2) 0 0;
+}
+.cta-section__button {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: var(--space-6);
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: var(--product-button);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color var(--motion-duration-fast) var(--motion-easing-standard);
+}
+.cta-section__button:hover,
+.cta-section__button:focus-visible {
+  background-color: var(--color-link);
+  color: var(--color-on-accent);
+}
+
+/* ============================================================ FOOTER */
+.site-footer {
+  background-color: var(--color-surface);
+  border-top: var(--stroke-default) solid var(--color-border);
+  padding-block: var(--space-16);
+}
+.site-footer__grid {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+@media (min-width: 768px) {
+  .site-footer__grid {
+    padding-inline: var(--space-16);
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  }
+}
+.site-footer__product {
+  font-family: var(--font-family-title);
+  font-weight: 700;
+  font-size: var(--product-h2);
+  margin: 0;
+  color: var(--color-fg);
+}
+.site-footer__tagline {
+  font-size: var(--product-body-sm);
+  color: var(--color-fg-subtle);
+  margin: var(--space-1) 0 0;
+  max-width: 32ch;
+}
+.site-footer__column h2 {
+  font-family: var(--font-family-body);
+  font-weight: 600;
+  font-size: var(--product-body-sm);
+  color: var(--color-fg);
+  margin: 0 0 var(--space-3);
+}
+.site-footer__column ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.site-footer__column a {
+  font-size: var(--product-body-sm);
+  color: var(--color-fg-subtle);
+  text-decoration: none;
+}
+.site-footer__column a:hover,
+.site-footer__column a:focus-visible {
+  color: var(--color-link);
+}
+.site-footer__bottom {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: var(--stroke-default) solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+@media (min-width: 768px) {
+  .site-footer__bottom {
+    padding-inline: var(--space-16);
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+.site-footer__copyright {
+  font-size: var(--product-caption);
+  color: var(--color-fg-subtle);
+  margin: 0;
+}
+.site-footer__lang {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--product-caption);
+  color: var(--color-fg-subtle);
+}
+.site-footer__lang a {
+  color: var(--color-fg-subtle);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: var(--space-1);
+}
+.site-footer__lang a[aria-current='true'] {
+  color: var(--color-link);
+}
+.site-footer__lang a:hover,
+.site-footer__lang a:focus-visible {
+  color: var(--color-link);
+}
+
+/* ============================================================ LEGAL PAGES */
+.legal-hero {
+  padding-block: var(--space-24) var(--space-6);
+}
+.legal-hero__inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+}
+.legal-hero h1 {
+  font-size: var(--product-display);
+}
+.legal-content {
+  padding-block: 0 var(--space-24);
+}
+.legal-content__inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+/* The outer container matches the header/footer's own 1280px+padding
+ * edges; this caps each child's own reading
+ * width so legal text doesn't stretch edge-to-edge on a wide screen —
+ * same "wide aligned container, narrower text measure" split the hero's
+ * `.hero__lede` already uses. */
+.legal-content__inner > * {
+  max-width: 70ch;
+}
+.legal-content address {
+  font-style: normal;
+  font-size: var(--product-body);
+  line-height: 1.6;
+  color: var(--color-fg-subtle);
+  margin-bottom: var(--space-4);
+}
+.legal-content h2 {
+  font-size: var(--product-h2);
+  margin-top: var(--space-6);
+}
+.legal-content p {
+  font-size: var(--product-body);
+  line-height: 1.6;
+  color: var(--color-fg-subtle);
+  margin: var(--space-2) 0 0;
+}
+.legal-content a {
+  color: var(--color-link);
+}
+.legal-template-notice {
+  background-color: var(--color-bg-subtle);
+  border: var(--stroke-default) solid var(--color-border);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.legal-template-notice__heading {
+  font-weight: 600;
+  color: var(--color-fg);
+  margin: 0;
+}
+.legal-template-notice p {
+  color: var(--color-fg-subtle);
+}
+
+/* ============================================================ 404 */
+.not-found {
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-24) var(--space-6);
+  text-align: center;
+}
+.not-found__code {
+  font-family: var(--font-family-title);
+  font-weight: 700;
+  font-size: var(--product-display);
+  color: var(--color-accent);
+  margin: 0;
+}
+.not-found h1 {
+  font-size: var(--product-display);
+}
+.not-found__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: var(--space-6);
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+.not-found__link:hover,
+.not-found__link:focus-visible {
+  background-color: var(--color-link);
+}
+
+/* ============================================================ MOTION
+ * Scroll-reveal (web/motion.js's initScrollReveal) — active only when the
+ * visitor has not requested reduced motion. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--motion-duration-slow) var(--motion-easing-standard),
+    transform var(--motion-duration-slow) var(--motion-easing-standard);
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

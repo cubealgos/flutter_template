@@ -1,0 +1,27 @@
+name: billing
+description: >-
+  Backend-agnostic web billing: `Billing` (start a checkout, open the customer
+  portal, update a subscription's quantity, read the entitlement), the
+  `Entitlement` read model computed from a subscription's state and the
+  current time, the append-only `BillingLedger` and `BillingEngine` (every
+  provider event is written to the ledger before any side effect, so a replay
+  is a no-op), `BillingReconciler` and an in-memory `FakeBilling`. The
+  merchant-of-record adapter is `backend/paddle`.
+publish_to: none
+resolution: workspace
+
+environment:
+  # Deliberately below the workspace's own ^3.13.0 (see root pubspec.yaml):
+  # `backend/appwrite/functions/api` and `hooks` depend on this package and
+  # build on Appwrite Cloud's `dart-3.12` runtime, like `jobs` and `teams`.
+  sdk: ^3.12.0
+
+dependencies:
+  # BSD-3-Clause (dart.dev): `@immutable` on the value types.
+  meta: ^1.16.0
+
+dev_dependencies:
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0

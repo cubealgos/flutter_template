@@ -1,0 +1,50 @@
+# slang's own config file, read by the `dart run slang` CLI (see the
+# `gen:l10n` melos script in the root pubspec.yaml). Explicit even where a
+# value matches slang's own default, so the locale/fallback behaviour this
+# app relies on (device locale, falling back to `en`) is a deliberate
+# setting here, not an inherited default that could silently change on a
+# future slang upgrade.
+#
+# This app deliberately does NOT use slang_build_runner: its
+# `slang_build_runner` builder is keyed on the synthetic `$lib$` input and
+# fans out through a `PostProcessBuilder` (see slang_build_runner's own
+# `build.yaml`, `build_extensions: { '$lib$': [...] }` plus
+# `post_process_builders: slang_fan_out`). `build_runner`'s
+# `--delete-conflicting-outputs` only knows to delete an output it can
+# derive from an ordinary file input or has recorded in a previous build's
+# asset graph — on a fresh clone (no `.dart_tool/build` cache) it has never
+# seen slang's `$lib$`-derived outputs before, so it refuses to overwrite
+# the committed `lib/i18n/strings*.g.dart` files
+# (`InvalidOutputException: Asset already exists`) instead of deleting and
+# regenerating them, while still deleting and regenerating every *other*
+# package's generated files first (those are ordinary per-input builders).
+# Confirmed independently: slang's own README lists `dart run slang` as
+# "recommended during development" and its FAQ documents this exact
+# `Asset already exists` failure (see slang-i18n/slang#351 and
+# dart-lang/build#4402, "`--delete-conflicting-outputs` ignored by
+# `PostProcessBuilder`"). The CLI writes these files directly via `dart:io`
+# instead of going through build_runner's asset writer, so it never hits
+# this conflict — the fix here is to run it, not build_runner, for l10n.
+base_locale: en
+fallback_strategy: base_locale
+input_directory: lib/i18n
+input_file_pattern: .i18n.json
+output_directory: lib/i18n
+output_file_name: strings.g.dart
+# Off (slang's own default is on): the header's "Built on <date> at <time>
+# UTC" line otherwise changes on every regeneration regardless of whether
+# any translation actually changed, which would make `melos run gen`
+# rewrite this file — and so fail `check-generated`/`gen-fresh-check`'s
+# `git status` clean check — on every single run, including two
+# back-to-back runs with no source changes at all (the "gen still
+# succeeds on a warm checkout, run it twice" criterion).
+timestamp: false
+# Off (slang's own default is on): with `lazy: true` every non-base locale
+# is a *deferred* library on web, and `main()`'s synchronous
+# `LocaleSettings.useDeviceLocaleSync()` switches to it before the deferred
+# JS part is loaded — the web app never boots on a German browser
+# ("Deferred library l_de was not loaded"). Deferred loading only
+# exists on web, so VM tests and native builds never show it. The string
+# set is tiny; compiling every locale in costs nothing worth deferring.
+lazy: false
+

@@ -1,0 +1,23 @@
+name: jobs
+description: >-
+  Backend-agnostic leased job queue: `JobQueue` (enqueue with a priority band,
+  claim with a lease, heartbeat, complete, fail, release), `JobQueueEngine`
+  (the one implementation of the rules, built on claim rows with a unique
+  (job id, attempt) key because TablesDB has no compare-and-set), `JobStore`
+  (its persistence seam) and an in-memory `FakeJobQueue` for tests.
+  `backend/appwrite/functions/api`'s `jobs` action runs the engine on Appwrite;
+  `backend/appwrite/adapters`'s `AppwriteJobQueue` calls that action.
+publish_to: none
+resolution: workspace
+
+environment:
+  # Deliberately below the workspace's own ^3.13.0 (see root pubspec.yaml):
+  # `backend/appwrite/functions/api` depends on this package and builds on
+  # Appwrite Cloud's `dart-3.12` runtime, like `teams`.
+  sdk: ^3.12.0
+
+dev_dependencies:
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0

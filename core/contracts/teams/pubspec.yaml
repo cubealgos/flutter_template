@@ -1,0 +1,23 @@
+name: teams
+description: >-
+  Backend-agnostic team tenancy: `TeamService` (teams, memberships with a
+  role, invitations, ownership transfer, a per-team membership history),
+  `TeamEngine` (the one implementation of the rules, including "exactly one
+  owner"), `TeamStore` (its persistence seam) and an in-memory
+  `FakeTeamBackend` for screens and tests. `backend/appwrite/functions/
+  team_admin` runs the engine on Appwrite Teams; `backend/appwrite/adapters`'s
+  `AppwriteTeamService` calls that function.
+publish_to: none
+resolution: workspace
+
+environment:
+  # Deliberately below the workspace's own ^3.13.0 (see root pubspec.yaml):
+  # `backend/appwrite/functions/team_admin` depends on this package and
+  # builds on Appwrite Cloud's `dart-3.12` runtime, like `appwrite_schema`.
+  sdk: ^3.12.0
+
+dev_dependencies:
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0

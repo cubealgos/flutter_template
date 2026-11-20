@@ -1,0 +1,79 @@
+name: appwrite_adapters
+description: >-
+  Appwrite adapters for `core/contracts/auth`, `core/contracts/data` and
+  `core/contracts/teams`: `AppwriteAuthService`, `AppwriteDocumentRepository`,
+  `AppwriteStorageService` and `AppwriteTeamService`, backed by the `appwrite`
+  client SDK. This
+  template's default backend wiring (see the plan's decision 4); an app
+  can swap in a different backend by implementing `AuthService`/
+  `DocumentRepository`/`StorageService` itself instead.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  # BSD-3-Clause (verified on pub.dev, matching `backend/appwrite/tool`'s
+  # `dart_appwrite` licence note). Targets Appwrite server 2.0.x per its
+  # own pub.dev listing - matches the Appwrite Cloud server this template targets. No `analyzer` dependency
+  # of its own (it's a plain runtime client SDK), so adding it doesn't move
+  # the workspace off the analyzer 10.x line `packages/domain`'s freezed
+  # pin already resolves to (verified with `dart pub deps` after adding
+  # this package). Unlike `backend/appwrite/
+  # tool`'s server-side `dart_appwrite`, the client `appwrite` package
+  # itself depends on `flutter` (for
+  # `flutter_web_auth_2`'s OAuth browser view, `path_provider`, …) - see
+  # `flutter` below.
+  appwrite: ^26.2.0
+  appwrite_schema:
+    path: ../schema
+  auth:
+    path: ../../../core/contracts/auth
+  billing:
+    path: ../../../core/contracts/billing
+  data:
+    path: ../../../core/contracts/data
+  domain:
+    path: ../../../packages/domain
+  # Required because `appwrite` itself depends on it (see above) - makes
+  # this a Flutter package, not a pure-Dart one, so melos's `flutter: true`
+  # packageFilters picks it up for `melos run test:flutter`
+  # (`flutter test`), not `test:dart`'s plain `dart test` - a bare `dart
+  # test` here fails outright trying to compile Flutter's own widget code
+  # without the Flutter engine (found by hand).
+  flutter:
+    sdk: flutter
+  jobs:
+    path: ../../../core/contracts/jobs
+  meta: ^1.16.0
+  teams:
+    path: ../../../core/contracts/teams
+
+dev_dependencies:
+  # Test-only: `test/integration/` reuses `appwrite_tool`'s own
+  # provisioning and `delete_account` deploy machinery (`Provisioner`,
+  # `DartAppwriteAdmin`, `BackendEnv`, `deploy/*`) rather than duplicating
+  # it, and `dart_appwrite` to build an admin-scoped client for setup/
+  # verification/cleanup (creating a pre-existing user, issuing a token
+  # without email delivery, confirming a deleted user is really gone) —
+  # see that test file's dartdoc. Neither is a dependency of the adapters
+  # themselves.
+  appwrite_tool:
+    path: ../tool
+  dart_appwrite: ^29.0.0
+  flutter_test:
+    sdk: flutter
+  # Test-only: the mail live suite mints and tampers with signed unsubscribe
+  # links with `UnsubscribeLinks`, using the secret it sets on the Function.
+  mailing:
+    path: ../../../core/contracts/mailing
+  paddle_billing:
+    path: ../../paddle
+  path: ^1.9.0
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0
+
+flutter:

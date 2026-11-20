@@ -1,0 +1,9 @@
+# Skips tests tagged `integration` by default, so `melos run test:flutter`
+# never needs a live Appwrite project — mirrors `backend/appwrite/tool/dart_test.yaml`.
+# Run them explicitly with `flutter test --tags integration --run-skipped`
+# — see the root pubspec.yaml's `test:integration:backend_appwrite` script.
+tags:
+  integration:
+    skip: >-
+      excluded from `melos run test` — run via `melos run
+      test:integration:backend_appwrite` against your Appwrite Cloud dev project

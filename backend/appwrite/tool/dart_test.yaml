@@ -1,0 +1,10 @@
+# Skips tests tagged `integration` by default, so a bare `dart test` (what
+# the root `test:dart` melos script runs) never needs a live Appwrite
+# project. Run them explicitly with `dart test --tags integration
+# --run-skipped` — see the root pubspec.yaml's `test:integration` script
+# and `backend/appwrite/README.md`.
+tags:
+  integration:
+    skip: >-
+      excluded from `melos run test` — run via `melos run test:integration`
+      against your Appwrite Cloud dev project

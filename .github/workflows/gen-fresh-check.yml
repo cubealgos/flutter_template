@@ -1,0 +1,54 @@
+# Verification only — no deployment step in this file. Runs on a
+# GitHub-hosted Linux runner (single, repeated `runs-on:` value — see ci.yml;
+# prerequisites in `.github/RUNNER.md`). Toolchain: `.github/actions/setup`.
+#
+# **Stays cold, deliberately**: unlike
+# the quick-check job in ci.yml, this one must never seed a build_runner
+# cache into the fresh clone `gen_fresh_check_command.dart` makes — no
+# `actions/cache` step at all, and `.dart_tool` is wiped by checkout. It is
+# its own job for exactly that reason.
+#
+# `GenFreshCheckCommand` shells out to a real `fvm use <version> --force`
+# inside that fresh clone (matching what `branch_new` does locally)
+# rather than trusting PATH alone, so this job additionally installs
+# `fvm` itself via `dart pub global activate fvm` — the one place in this
+# repo's CI that needs it. Without the FVM_CACHE_PATH seed below, that
+# `fvm use` would find no SDK installed under fvm's own version cache and
+# download Flutter *again* from scratch, even though the pinned build
+# already sits in the tool cache (`FLUTTER_SDK_DIR`, exported by
+# `.github/actions/setup`) — pointing `FVM_CACHE_PATH` at a fresh
+# directory containing only a symlink `versions/<version> -> $FLUTTER_SDK_DIR`
+# makes `fvm use` link it into the fresh clone's `.fvm/flutter_sdk` with no
+# network call. Workflow-local, not part of the shared setup action: no
+# other job invokes `fvm` at all.
+
+name: gen-fresh-check
+
+on:
+  push:
+    branches: [development, production]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  gen-fresh-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+
+      - name: dart run melos run gen-fresh-check
+        shell: bash
+        run: |
+          set -e
+          dart pub global activate fvm
+          FVM_SEED_CACHE=$(mktemp -d)
+          trap 'rm -rf "$FVM_SEED_CACHE"' EXIT
+          mkdir -p "$FVM_SEED_CACHE/versions"
+          ln -sfn "$FLUTTER_SDK_DIR" "$FVM_SEED_CACHE/versions/3.47.5"
+          export FVM_CACHE_PATH="$FVM_SEED_CACHE"
+          dart run melos run gen-fresh-check

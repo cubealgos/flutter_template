@@ -1,0 +1,127 @@
+{
+  "color": {
+    "paper": {
+      "$type": "color",
+      "$value": "#F5F6FA",
+      "$description": "Page background, default node fill. AA-derived light counterpart of the reference site's `--color-ground` (value from the 2026-09-25 app-design review pass, independently WCAG-verified)."
+    },
+    "paper-2": {
+      "$type": "color",
+      "$value": "#E7EBF3",
+      "$description": "Container bg, secondary fill — no reference-site equivalent, derived."
+    },
+    "surface": {
+      "$type": "color",
+      "$value": "#ffffff",
+      "$description": "Raised above paper — card fill, raised node fill"
+    },
+    "ink": {
+      "$type": "color",
+      "$value": "#12151C",
+      "$description": "Primary text, primary stroke. 16.91:1 on paper, 18.26:1 on surface (AAA). AA-derived light counterpart of the reference site's `--color-ink` (2026-09-25 review pass)."
+    },
+    "muted": {
+      "$type": "color",
+      "$value": "#5B6478",
+      "$description": "Secondary text, default stroke. 5.49:1 on paper, 5.93:1 on surface (AA). AA-derived light counterpart of the reference site's `--color-muted` (2026-09-25 review pass)."
+    },
+    "soft": {
+      "$type": "color",
+      "$value": "#6B7690",
+      "$description": "Sublabels, boundary labels — no reference-site equivalent, derived."
+    },
+    "rule": {
+      "$type": "color",
+      "$value": "rgba(18, 21, 28, 0.12)",
+      "$description": "Hairline borders"
+    },
+    "rule-solid": {
+      "$type": "color",
+      "$value": "#AEB8CA",
+      "$description": "Stronger borders, baselines. 1.85:1 on paper, 2.00:1 on surface — below WCAG 1.4.11's 3:1 by design (decorative, not interactive), matched to the dark theme's own edge-on-ground band (2.03:1). The reference site's `--color-edge` allowance (2026-09-25 review pass)."
+    },
+    "accent": {
+      "$type": "color",
+      "$value": "#3B4FE0",
+      "$description": "GRAPHIC colour only: fills, focus rings, interactive borders. 5.75:1 on paper (AA) — darkened from the dark theme's `#5B6CFF` specifically so it clears AA on a light ground. Never for text below 18px; use `link`. AA-derived light counterpart of the reference site's `--color-signal` (2026-09-25 review pass)."
+    },
+    "accent-tint": {
+      "$type": "color",
+      "$value": "rgba(59, 79, 224, 0.08)",
+      "$description": "Fill for accent-bordered elements"
+    },
+    "link": {
+      "$type": "color",
+      "$value": "#2A3BC7",
+      "$description": "The accent TEXT colour, 7.63:1 on paper, 8.24:1 on surface — correct everywhere, no context check needed. AA-derived light counterpart of the reference site's `--color-signal-light` (2026-09-25 review pass)."
+    },
+    "accent-soft": {
+      "$type": "color",
+      "$value": "#7B85E0",
+      "$description": "Tertiary — opt-in third tier, rank/subordinate emphasis."
+    },
+    "accent-dark": {
+      "$type": "color",
+      "$value": "#242C7A",
+      "$description": "Signal-tinted surface — the one background that deliberately breaks from `paper`/`surface` (the final CTA band). Same value in light and dark; it is always a dark accent band, not a themed one. The reference site's `--color-signal-dark`."
+    },
+    "on-accent": {
+      "$type": "color",
+      "$value": "#FFFFFF",
+      "$description": "Text/icons on a filled `accent` surface — 8.24:1 on `link`, and clears AA on the graphic `accent` fill at button-label sizes (≥16px, 600 weight). White text on the accent works in the light theme, unlike the dark theme (which must use `paper`-coloured text on its accent) — this asymmetry is real and intentional, not a copy-paste error (2026-09-25 review pass)."
+    },
+    "on-fill": {
+      "$type": "color",
+      "$value": "#ffffff",
+      "$description": "Fixed white for text on `accent-dark`, the always-dark CTA band that never flips with the theme. Not for themed fills: text on `accent`/`danger` (filled buttons, the checkbox mark) uses `on-accent`, which is ground-coloured in dark."
+    },
+    "danger": {
+      "$type": "color",
+      "$value": "#B3261E",
+      "$description": "Destructive or failed state. 6.05:1 on paper (AA) — computed and WCAG-verified against the new paper/surface pair (2026-09-25 review pass).",
+      "$extensions": {
+        "com.example.audience": "product"
+      }
+    },
+    "success": {
+      "$type": "color",
+      "$value": "#1E7A34",
+      "$description": "Completed or valid state. 5.00:1 on paper (AA) — computed and WCAG-verified against the new paper/surface pair (2026-09-25 review pass).",
+      "$extensions": {
+        "com.example.audience": "product"
+      }
+    },
+    "warning": {
+      "$type": "color",
+      "$value": "#8A5300",
+      "$description": "Needs attention but not failed. 5.86:1 on paper (AA) — computed and WCAG-verified against the new paper/surface pair (2026-09-25 review pass).",
+      "$extensions": {
+        "com.example.audience": "product"
+      }
+    },
+    "disabled": {
+      "$type": "color",
+      "$value": "#9a9ea8",
+      "$description": "Inert control text and border. Deliberately low contrast (2.46) — WCAG exempts disabled controls; never use for enabled text.",
+      "$extensions": {
+        "com.example.audience": "product"
+      }
+    },
+    "focus-ring": {
+      "$type": "color",
+      "$value": "#12151C",
+      "$description": "Focus indicator: 2px ink-on-paper ring, a standard focus-ring recipe. 16.91:1 on paper. Its own token so it can diverge from accent.",
+      "$extensions": {
+        "com.example.audience": "product"
+      }
+    },
+    "scrim": {
+      "$type": "color",
+      "$value": "rgba(18, 21, 28, 0.48)",
+      "$description": "Modal and drawer backdrop, built from ink rather than pure black.",
+      "$extensions": {
+        "com.example.audience": "product"
+      }
+    }
+  }
+}

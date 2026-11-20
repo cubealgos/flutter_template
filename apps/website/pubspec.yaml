@@ -1,0 +1,109 @@
+name: website
+description: >-
+  The template's landing page: a Jaspr static site, cloned
+  alongside apps/app. Every app gets a landing page here — neutral
+  placeholder content in this template, replaced with real copy after
+  cloning (see `tooling:rename`).
+publish_to: none
+resolution: workspace
+version: 1.0.0
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  # MIT (pub.dev, verified 2026-09-24). The web framework itself — static
+  # mode (`jaspr: mode: static` below). Pinned to the exact 0.23.1 patch:
+  # it is the last jaspr release whose companion `jaspr_builder`/
+  # `jaspr_cli` still depend on `analyzer ^10.0.0` — 0.23.2 and later move
+  # to `analyzer ^12.1.0`, which conflicts with this workspace's analyzer
+  # 10.x-13.x pin (packages/domain's freezed 3.2.5 needs analyzer <11 — see
+  # that package's pubspec.yaml). See CLAUDE.md and this package's README.
+  jaspr: 0.23.1
+  # The single source for this site's Impressum/Datenschutz placeholder
+  # legal-entity facts — pure Dart, so it doesn't reintroduce a
+  # Flutter dependency (see this site's own Flutter-free CLAUDE.md row).
+  # `apps/app`'s `AppConfig` reads the same package, so the two can never
+  # drift the way the old duplicated `LegalPlaceholders` class (and its
+  # test importing the Flutter `app` package) could. A path dependency,
+  # not published — a workspace member already resolved into this
+  # workspace's single pubspec.lock.
+  legal_facts:
+    path: ../../core/contracts/legal_facts
+  # No `jaspr_router` dependency, deliberately (see `lib/app.dart`'s own
+  # doc comment): every published jaspr_router version from 0.8.1 through
+  # the current 0.9.0 calls `AppBinding.basePath`, a getter jaspr only
+  # gained in 0.23.2 — confirmed directly against both packages' source,
+  # not just their declared `jaspr: ^0.23.0` pub constraint, which does
+  # not actually reflect this. `jaspr build` on this exact pin
+  # (`jaspr_router: 0.9.0` + `jaspr: 0.23.1`) fails at compile time with
+  # "The getter 'basePath' isn't defined for the type 'AppBinding'" inside
+  # jaspr_router's own `router.dart`/`link.dart`/`redirection.dart` — a
+  # real, reproduced incompatibility, not a theoretical one. `lib/app.dart`
+  # implements the small amount of routing this site needs (a path
+  # `switch` plus `ServerApp.requestRouteGeneration` calls to drive the
+  # static crawl) directly against `package:jaspr/server.dart` instead.
+
+dev_dependencies:
+  # MIT (pub.dev, verified 2026-09-24). Pinned to the exact version
+  # already resolved elsewhere in this workspace (core/design/tokens_builder,
+  # packages/domain) — see those packages' pubspec.yaml doc comments for
+  # the analyzer-compatibility chain this keeps a single shared resolution
+  # on.
+  build_runner: 2.15.1
+  # BSD-3-Clause (pub.dev, verified 2026-09-24). The Dart-to-JS builder
+  # jaspr's own toolchain wires into build_runner for the client bundle.
+  # Pinned to the exact version at the intersection of two independent
+  # constraints across this package's whole version history: an
+  # `environment: sdk:` upper bound low enough to *require* Dart 3.13.x
+  # (ruling out 4.4.x/earlier, which all cap below 3.13.0 — this
+  # workspace's FVM-pinned SDK is 3.13.4) and an `analyzer` upper bound
+  # this workspace's analyzer 10.x-13.x pin still satisfies (ruling out
+  # 4.8.6+, which raises the floor to `>=13.3.0`). 4.8.5 is the one
+  # version satisfying both — verified directly against pub.dev's full
+  # version list (every version's `sdk`/`analyzer` constraints checked by
+  # hand, not assumed from the caret range alone).
+  build_web_compilers: 4.8.5
+  # MIT (pub.dev, verified 2026-09-24). Generates the per-file codegen
+  # `jaspr build`/`jaspr serve` need (server/client options, platform
+  # imports) — see this package's own build.yaml (installed, not hand-
+  # written) and CLAUDE.md's routing row. Pinned to the exact 0.23.1
+  # patch matching the `jaspr` pin above; depends on `analyzer ^10.0.0`
+  # and `jaspr: 0.23.1` exactly, which is why both are pinned together.
+  jaspr_builder: 0.23.1
+  # MIT (pub.dev, verified 2026-09-24). The CLI (`jaspr build`/`jaspr
+  # serve`), invoked as a dev dependency via `dart run
+  # jaspr_cli:jaspr <command>` — never globally activated (`dart pub
+  # global activate`), per the workspace's Dart-only-tooling rule (no
+  # globally-activated tools). Pinned to the exact 0.23.1 patch; depends
+  # on `analyzer ^10.0.0` directly (its own dev-server tooling, not just a
+  # transitive pull from jaspr_builder).
+  jaspr_cli: 0.23.1
+  # MIT (pub.dev, verified 2026-09-24). `testServer`/`ServerTester` render
+  # this site's components server-side inside a plain `dart test` (see
+  # test/), without needing a real `jaspr build` first. Pinned to the
+  # exact 0.23.1 patch matching `jaspr` above; declares no `analyzer`
+  # dependency of its own.
+  jaspr_test: 0.23.1
+  path: ^1.9.0
+  test: ^1.25.0
+  # Own copy for the same reason every other workspace member declares
+  # one: this package's analysis_options.yaml `include:
+  # ../../analysis_options.yaml` chain reaches the root's
+  # very_good_analysis pin through the workspace's single shared pub
+  # resolution, not through a direct dependency of its own — see the root
+  # pubspec.yaml for the fuller explanation.
+  very_good_analysis: ^11.0.0
+
+# Jaspr's own rendering-mode config (see package:jaspr_cli). `static`:
+# every declared route is pre-rendered to a static HTML file at build
+# time (`jaspr build`) — no persistent server process ships, matching
+# "landing page" hosting on any plain static host. See lib/main.server.dart
+# and lib/app.dart.
+#
+# `port`: the server `jaspr build` starts while pre-rendering (and
+# `jaspr serve`). Not jaspr's default 8080, which commonly clashes
+# with other local services.
+jaspr:
+  mode: static
+  port: 8091

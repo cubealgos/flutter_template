@@ -1,0 +1,32 @@
+# build_runner's default source visibility for a root package (see
+# `defaultInBuildPackageSources` in build_runner's build_configs.dart) does
+# NOT include `tokens/**` — only lib/, bin/, test/, web/, and a few others.
+# Declaring `sources: include:` REPLACES that default list rather than
+# extending it, so this repeats every entry of the default plus `tokens/**`
+# and the `$package$` placeholder `package:tokens_builder`'s builder targets
+# (required — see core/design/tokens_builder/build.yaml's `build_extensions`).
+# Verified 2026-09-24: without this file, `melos run gen` silently sees zero
+# `tokens/*.json` inputs and `tokensBuilder` fails with "No color.<theme>.json
+# file found for required theme(s): light, dark." even though the files are
+# right there on disk.
+targets:
+  $default:
+    sources:
+      include:
+        - assets/**
+        - benchmark/**
+        - bin/**
+        - CHANGELOG*
+        - example/**
+        - lib/**
+        - test/**
+        - integration_test/**
+        - tool/**
+        - web/**
+        - node/**
+        - LICENSE*
+        - pubspec.yaml
+        - pubspec.lock
+        - README*
+        - tokens/**
+        - $package$

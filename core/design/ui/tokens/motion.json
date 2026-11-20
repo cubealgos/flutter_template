@@ -1,0 +1,12 @@
+{
+  "motion": {
+    "duration": {
+      "fast": { "$type": "duration", "$value": "160ms", "$description": "Micro-interactions — button press, toggle" },
+      "step": { "$type": "duration", "$value": "480ms", "$description": "Standard transition — modal entrance, list item reveal" },
+      "hold": { "$type": "duration", "$value": "720ms", "$description": "Deliberate pause between sequenced steps" }
+    },
+    "ease": {
+      "standard": { "$type": "cubicBezier", "$value": [0.2, 0.8, 0.2, 1], "$description": "Default easing for all motion — matches diagram-design's own curve" }
+    }
+  }
+}

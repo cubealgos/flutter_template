@@ -1,0 +1,82 @@
+name: Setup Flutter toolchain
+description: >-
+  Installs (or reuses) the pinned, sha256-verified Flutter SDK under the
+  runner's tool cache, points PATH/analytics/melos at it and runs
+  `dart pub get`. The single canonical copy every `.github/workflows/*.yml`
+  calls. Written for GitHub-hosted Linux runners (see
+  `.github/RUNNER.md`); on a persistent runner the SDK is reused between
+  runs, on a hosted one it is downloaded each time.
+
+runs:
+  using: composite
+  steps:
+    - name: Check runner prerequisites
+      shell: bash
+      run: |
+        set -eu
+        missing=""
+        for tool in git curl tar xz sha256sum flock; do
+          command -v "$tool" >/dev/null 2>&1 || missing="$missing $tool"
+        done
+        if [ -n "$missing" ]; then
+          echo "::error::runner is missing:$missing — see .github/RUNNER.md"
+          exit 1
+        fi
+        # `git worktree add --relative-paths` (used by core/tooling/tooling
+        # and its tests) needs git >= 2.48.
+        git_version=$(git --version | sed -E 's/^git version ([0-9]+\.[0-9]+).*/\1/')
+        if [ "$(printf '%s\n2.48\n' "$git_version" | sort -V | head -n1)" != "2.48" ]; then
+          echo "::error::git $git_version is too old, need >= 2.48 — see .github/RUNNER.md"
+          exit 1
+        fi
+        if [ -z "${RUNNER_TOOL_CACHE:-}" ]; then
+          echo "::error::RUNNER_TOOL_CACHE is not set — is this a GitHub Actions runner?"
+          exit 1
+        fi
+
+    # Installed once into `$RUNNER_TOOL_CACHE/flutter/<version>-<sha16>/` and
+    # reused by every later run: the directory name carries the pin, and a
+    # `.pinned-sha256` marker (written last, after the precache) proves the
+    # install finished and matches the full pinned sha256. A missing or
+    # mismatching marker only ever costs a re-download, never serves the
+    # wrong SDK. `flock` serializes concurrent jobs on the same host; the
+    # tarball is verified before it is extracted.
+    - name: Install or reuse pinned Flutter SDK
+      shell: bash
+      run: |
+        set -eu
+        FLUTTER_VERSION=3.47.5
+        FLUTTER_SHA256=2132e990f236f8d22e7c6314b29a191a95b10d7cbcfec9b4e2e303d996652cbb
+        root="$RUNNER_TOOL_CACHE/flutter"
+        sdk="$root/${FLUTTER_VERSION}-${FLUTTER_SHA256:0:16}"
+        mkdir -p "$root"
+        (
+          flock 9
+          if [ "$(cat "$sdk/.pinned-sha256" 2>/dev/null || true)" = "$FLUTTER_SHA256" ] \
+              && [ -x "$sdk/bin/flutter" ]; then
+            echo "Reusing Flutter $FLUTTER_VERSION at $sdk"
+          else
+            echo "Installing Flutter $FLUTTER_VERSION into $sdk"
+            rm -rf "$sdk"
+            tmp=$(mktemp -d "$root/.install.XXXXXX")
+            trap 'rm -rf "$tmp"' EXIT
+            curl -fsSL -o "$tmp/flutter.tar.xz" \
+              "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz"
+            echo "${FLUTTER_SHA256}  $tmp/flutter.tar.xz" | sha256sum -c -
+            tar -xf "$tmp/flutter.tar.xz" -C "$tmp"
+            mv "$tmp/flutter" "$sdk"
+            "$sdk/bin/flutter" precache --web --linux
+            echo "$FLUTTER_SHA256" > "$sdk/.pinned-sha256"
+          fi
+        ) 9>"$root/.lock"
+        echo "FLUTTER_SDK_DIR=$sdk" >> "$GITHUB_ENV"
+        echo "$sdk/bin" >> "$GITHUB_PATH"
+        echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+        echo "DASH__SUPPRESS_ANALYTICS=true" >> "$GITHUB_ENV"
+        echo "MELOS_SDK_PATH=auto" >> "$GITHUB_ENV"
+        "$sdk/bin/flutter" config --no-analytics
+        "$sdk/bin/dart" --disable-analytics
+
+    - name: dart pub get
+      shell: bash
+      run: dart pub get

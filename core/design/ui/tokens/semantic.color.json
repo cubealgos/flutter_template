@@ -1,0 +1,29 @@
+{
+  "color": {
+    "bg": {
+      "$type": "color",
+      "$value": "{color.paper}",
+      "$description": "Page background. The surface everything else sits on."
+    },
+    "fg": {
+      "$type": "color",
+      "$value": "{color.ink}",
+      "$description": "Primary text and icons."
+    },
+    "border": {
+      "$type": "color",
+      "$value": "{color.rule-solid}",
+      "$description": "Hairlines and component outlines — the reference site's `--color-edge`: a solid container hairline, deliberately below AA (decorative, not interactive)."
+    },
+    "bg-subtle": {
+      "$type": "color",
+      "$value": "{color.paper-2}",
+      "$description": "A recessed background \u2014 a well, a table stripe, a disabled field."
+    },
+    "fg-subtle": {
+      "$type": "color",
+      "$value": "{color.muted}",
+      "$description": "Secondary text: captions, help text, metadata."
+    }
+  }
+}

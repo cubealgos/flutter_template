@@ -1,0 +1,3 @@
+# Commit SHAs exempt from the commit-msg rule enforced by
+# core/tooling/tooling/bin/lint_history.dart. One full SHA per line; `#` starts a
+# comment. Keep this empty unless history genuinely can't be rewritten.

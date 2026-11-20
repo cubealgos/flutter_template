@@ -1,0 +1,13 @@
+builders:
+  tokens_builder:
+    import: "package:tokens_builder/builder.dart"
+    builder_factories: ["tokensBuilder"]
+    build_extensions:
+      $package$:
+        - "lib/src/tokens.g.dart"
+    # Applied automatically to any package that depends on tokens_builder
+    # (core/design/ui, as a dev_dependency) — no build.yaml needed there.
+    auto_apply: dependents
+    # Writes into the real source tree, not .dart_tool/build/ — tokens.g.dart
+    # is committed, like every other *.g.dart in this workspace.
+    build_to: source

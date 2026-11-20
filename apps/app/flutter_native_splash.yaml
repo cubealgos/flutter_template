@@ -1,0 +1,18 @@
+# flutter_native_splash (MIT, jonbhanson/flutter_native_splash, pinned in pubspec.yaml)
+# regenerates the native splash screen (Android incl. the Android 12+ splash API, iOS, web) from
+# apps/app/assets/icon/icon_foreground.png — transparent background, so this file's `color` shows
+# through around the mark (see assets/icon/README.md). Run via `dart run melos run icons`
+# (core/tooling/tooling's `icons` command), never by hand.
+flutter_native_splash:
+  # core/design/ui/tokens/color.light.json: color.paper — the page/surface
+  # background token, simple enough to use directly as the splash
+  # background (see flutter_launcher_icons.yaml's web section for the same
+  # reasoning on why this is a literal hex, not read from the JSON).
+  color: "#f5f5f5"
+  image: "assets/icon/icon_foreground.png"
+
+  android_12:
+    color: "#f5f5f5"
+    image: "assets/icon/icon_foreground.png"
+
+  web: true

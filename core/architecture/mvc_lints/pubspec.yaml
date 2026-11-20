@@ -1,0 +1,38 @@
+name: mvc_lints
+description: >-
+  In-repo analyzer plugin enforcing MVC boundaries: views (files named
+  `*_view.dart`, files under `widgets/` or `layouts/`, or classes extending
+  ViewWidget/InheritedViewWidget) may not
+  import navigation/network/data packages or call navigation APIs directly.
+publish_to: none
+
+# Named `mvc_lints`, not `lints` — the latter collides with the Dart team's
+# own `package:lints`.
+#
+# Deliberately NOT a workspace member (no `resolution: workspace`, not listed
+# in the root pubspec's `workspace:` key). `analysis_server_plugin` and its
+# `analyzer: ^14.1.0` constraint would otherwise force the whole monorepo
+# workspace onto analyzer 14, which conflicts with the deliberate analyzer
+# 10.x-13.x pin (see root analysis_options.yaml). Because it is unlisted,
+# this package gets its own independent pub resolution and lockfile —
+# `cd core/architecture/mvc_lints && dart pub get` — completely separate from the
+# workspace's `dart pub get`. The Dart analysis server resolves it the same
+# way: as a `path:` plugin under `plugins:` in analysis_options.yaml, into a
+# synthetic package under `~/.dartServer/.plugin_manager/`, never into the
+# workspace's own resolution. See CLAUDE.md for the routing.
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  analysis_server_plugin: ^0.3.20
+  analyzer: ^14.1.0
+
+dev_dependencies:
+  test: ^1.25.0
+  # Own copy, independent of the workspace root's — this package has its own
+  # analysis_options.yaml (no `include:` chain back to the root's, since
+  # that file's `plugins:` block resolves relative to the *workspace's* pub
+  # setup, not this package's). Also what stops a bare `dart format .` at
+  # the repo root from printing a package-resolution warning when it walks
+  # into this directory looking for formatter config.
+  very_good_analysis: ^11.0.0

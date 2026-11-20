@@ -1,0 +1,20 @@
+# Deliberately standalone — this package is not a workspace member (see
+# pubspec.yaml) and has its own pub resolution, so it does not `include:`
+# the workspace root's `analysis_options.yaml` (that file's `plugins:` block
+# is workspace-specific and its `very_good_analysis` dependency isn't part
+# of this package's own resolution anyway).
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+linter:
+  rules:
+    # Same call as the workspace root's analysis_options.yaml, and for the
+    # same reason: this repo doesn't adopt Dart 3.13 primary constructors
+    # yet (public_member_api_docs doesn't reliably recognize a class-level
+    # doc comment as covering a folded-in primary constructor too).
+    unnecessary_type_name_in_constructor: false

@@ -1,0 +1,444 @@
+name: flutter_template_workspace
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+workspace:
+  - apps/app
+  - apps/website
+  - core/architecture/mvc
+  - core/tooling/tooling
+  - packages/domain
+  - backend/appwrite/schema
+  - core/design/tokens_builder
+  - core/design/ui
+  - core/contracts/auth
+  - core/contracts/data
+  - core/contracts/teams
+  - core/contracts/jobs
+  - core/contracts/mailing
+  - core/contracts/billing
+  - core/contracts/legal_facts
+  - backend/appwrite/adapters
+  - backend/appwrite/tool
+  - backend/appwrite/functions/api
+  - backend/appwrite/functions/hooks
+  - backend/paddle
+
+dev_dependencies:
+  melos: ^8.9.0
+  # The root base for every workspace member's analysis_options.yaml (see
+  # `include:` at the top of the root file). MIT-licensed, ~200 rules incl.
+  # `public_member_api_docs`. Declared once here — the workspace's shared
+  # pub resolution (one package_config.json for the whole tree) makes it
+  # resolvable from every member's `include: ../../analysis_options.yaml`
+  # chain without each member also depending on it directly.
+  very_good_analysis: ^11.0.0
+
+melos:
+  # Pins every melos-spawned command (both `exec:` and `run:` scripts) to the
+  # FVM-managed Flutter SDK by prepending `.fvm/flutter_sdk/bin` to PATH —
+  # without this, bare `dart`/`flutter` inside a script resolve to whatever
+  # `~/fvm/default` (or the system SDK) happens to be, not the 3.47.5 pinned
+  # by `.fvmrc`. Resolution order (melos): `--sdk-path` CLI flag >
+  # `MELOS_SDK_PATH` env var > this `sdkPath`. CI has no `.fvm/` checkout
+  # artifact (it's gitignored) and installs its own pinned Flutter directly
+  # onto PATH, so CI must set `MELOS_SDK_PATH=auto` to make melos skip this
+  # `sdkPath` and use PATH's SDK as-is (see `resolveSdkPath` in melos'
+  # lib/src/workspace.dart, and `autoSdkPathOptionValue` in
+  # lib/src/common/utils.dart — `auto` short-circuits to `null`, i.e. "don't
+  # override PATH"). See CLAUDE.md for the CI reminder.
+  sdkPath: .fvm/flutter_sdk
+
+  command:
+    run:
+      # Never show the interactive "Select a package" prompt for a multi-
+      # package `exec:` script; always run across every filter-matched
+      # package instead, deterministically. Without this, `melos run
+      # analyze`/`test` etc. print a package-selector prompt whenever more
+      # than one package matches — see the `noSelect` handling in melos'
+      # lib/src/commands/run.dart (`noSelect || packageFilters != null` skips
+      # straight to `choices[0]`, the "run in every matching package" choice)
+      # and lib/src/command_configs/run.dart for this config key.
+      noSelect: true
+
+  scripts:
+    gen:
+      steps:
+        - gen:l10n
+        - gen:build_runner
+        - gen:website-tokens
+      description: >-
+        Regenerate every generated file: slang's l10n output first, then
+        build_runner for everything else, then apps/website's generated
+        CSS token file. Split into steps — never one
+        build_runner pass — because slang's own builder can't be part of
+        that pass (see `gen:l10n`'s description) and the website's CSS
+        emitter is a plain bin, not a Builder (see `gen:website-tokens`'s
+        description).
+
+    gen:l10n:
+      run: >-
+        dart run melos exec --depends-on=slang --
+        "dart run slang"
+      description: >-
+        Generate `lib/i18n/*.g.dart` via slang's own CLI, its documented
+        primary path (pub.dev/packages/slang's README lists `dart run
+        slang` as "recommended during development"; reads each package's
+        `slang.yaml`). Deliberately not slang_build_runner (removed):
+        that builder is keyed on the synthetic `$lib$` input and fans out
+        through a `PostProcessBuilder`, and build_runner's
+        `--delete-conflicting-outputs` can only delete an output it
+        recognizes from an ordinary file input or a previous build's own
+        asset-graph cache — on a fresh clone (no `.dart_tool/build`) it
+        doesn't recognize the committed `$lib$`-derived
+        `lib/i18n/strings*.g.dart` files as its own and refuses to
+        overwrite them (`InvalidOutputException: Asset already exists`),
+        while still correctly deleting and regenerating every other
+        package's own outputs first. Confirmed against slang-i18n/slang#351
+        and dart-lang/build#4402 ("`--delete-conflicting-outputs` ignored
+        by `PostProcessBuilder`"). Uses `run:` (not `exec:`) so it
+        succeeds as a no-op while no package depends on `slang` yet.
+
+    gen:build_runner:
+      run: >-
+        dart run melos exec --depends-on=build_runner --
+        "dart run build_runner build --delete-conflicting-outputs"
+      description: >-
+        Run build_runner in every package that depends on it. Uses `run:`
+        (not `exec:`) so it succeeds as a no-op while no package depends on
+        build_runner yet — `melos run` with an `exec:` script and
+        packageFilters errors out instead of no-op'ing when zero packages
+        match.
+
+    gen:website-tokens:
+      run: >-
+        dart run tokens_builder:build_css --tokens core/design/ui/tokens
+        --out apps/website/web/tokens.g.css
+      description: >-
+        Generates apps/website/web/tokens.g.css — the same DTCG source
+        (core/design/ui/tokens/*.json) the Flutter app's tokens.g.dart is
+        built from, emitted as plain CSS custom properties (light default,
+        dark via `prefers-color-scheme`) instead of `package:mix` tokens.
+        A bin, not a build_runner Builder, since a Builder can only read/
+        write inside its own package (core/design/tokens_builder) and this
+        needs to read core/design/ui/tokens and write into apps/website — see
+        core/design/tokens_builder/bin/build_css.dart. Committed, never hand-
+        edited; covered by check-generated/gen-fresh-check via `gen:`.
+
+    analyze:
+      run: >-
+        dart run tooling:clean_duplicate_index && dart analyze
+        --fatal-infos
+      description: >-
+        Static analysis of the whole workspace in ONE analysis server:
+        a single `dart analyze --fatal-infos` run from the root, which
+        picks up each member's own analysis_options.yaml (checked: same
+        findings as the old per-package run, solid_lints/mvc_lints
+        included). The old per-package fan-out started one server plus
+        both plugins per package (~6 at once on the 6-core CI runner,
+        >9 GB: OOM-killed) and raced to compile the plugin snapshot on a
+        cold cache, which needed a serial `analyze:prime` step.
+        Measured locally: ~52s wall / ~1.8 GB for the melos process
+        alone (children not counted) before, ~25s wall / ~2.0 GB after.
+
+        Deletes every `.dart_tool/solid_lints/duplicate_index.json` first
+        (`tooling:clean_duplicate_index`, see its doc comment): a stale
+        persisted `avoid_duplicate_code` index causes false positives and
+        negatives.
+
+    test:flutter:
+      exec: flutter test
+      packageFilters:
+        flutter: true
+    test:dart:
+      exec: dart test
+      packageFilters:
+        flutter: false
+        dirExists:
+          - test
+    test:mvc_lints:
+      run: cd core/architecture/mvc_lints && dart pub get && dart test
+      description: >-
+        Tests core/architecture/mvc_lints (the MVC-boundary analyzer plugin) via its
+        own, independent pub resolution — it is never a workspace member
+        (see its pubspec.yaml: analysis_server_plugin/analyzer ^14 would
+        otherwise conflict with the workspace's own analyzer 10.x-13.x pin),
+        so it can't be reached by test:dart's packageFilters.
+
+    test:
+      steps:
+        - test:flutter
+        - test:dart
+        - test:mvc_lints
+      description: >-
+        flutter test for Flutter packages, dart test for pure Dart ones
+        (workspace members), plus core/architecture/mvc_lints' own dart test.
+
+    format:
+      run: dart format --set-exit-if-changed .
+      description: Check formatting across the workspace.
+
+    check-generated:
+      run: dart run melos run gen && git diff --exit-code
+      description: >-
+        Regenerate codegen output and fail if the tree is dirty. Local use
+        only (and `tooling:finish`): `ci` does not run it, `gen-fresh-check`
+        covers the same failure from a clean clone.
+
+    gen-fresh-check:
+      run: dart run tooling:gen_fresh_check
+      description: >-
+        Regression guard: clones HEAD into a fresh temp directory,
+        links it to the same `.fvmrc`-pinned FVM Flutter SDK `branch_new`
+        uses, runs `pub get` then `melos run gen` there, and fails unless
+        the result matches HEAD exactly (`git status --porcelain` empty).
+        Unlike `check-generated`, which reruns `gen` in *this* checkout and
+        so can inherit an already-primed `.dart_tool/build` cache,
+        `gen-fresh-check` has no such cache to fall back on — the same
+        condition a real fresh clone or CI checkout is in. CI-callable.
+
+    map:
+      run: dart run tooling:map
+      description: Regenerate docs/map.md and docs/map/*.md.
+
+    icons:
+      run: dart run tooling:icons
+      description: >-
+        Regenerate every platform launcher icon and splash screen from
+        apps/app/assets/icon/icon.png: runs flutter_launcher_icons
+        then flutter_native_splash inside apps/app, then fills the gaps
+        they leave (favicon.ico, apple-touch-icon.png, the Linux icon +
+        .desktop entry, and idempotent web/index.html link tags). See
+        apps/app/assets/icon/README.md.
+
+    website:build:
+      run: >-
+        cd apps/website && dart run jaspr_cli:jaspr build &&
+        rm -rf build/jaspr/packages
+      description: >-
+        Builds apps/website's static site (mode: static — every route
+        declared in lib/app.dart is pre-rendered to
+        build/jaspr/**/index.html, plus build/jaspr/404.html and
+        build/jaspr/de/404.html for static-host 404 conventions).
+        `build/jaspr/packages/` is stripped afterward: build_web_compilers
+        always publishes the whole dependency source graph for JS
+        source-map resolution even though this site ships zero compiled
+        Dart-to-JS (no `@client` component anywhere — motion is a plain
+        static script, see web/motion.js's own doc comment) and nothing
+        in the generated HTML references it. Output directory is
+        gitignored.
+
+    website:serve:
+      run: cd apps/website && dart run jaspr_cli:jaspr serve
+      description: >-
+        Runs apps/website's dev server with hot reload, for local
+        development only — not used by CI or `website:build`.
+
+    web-smoke:
+      steps:
+        - web-smoke:build-app
+        - website:build
+        - web-smoke:run
+      description: >-
+        The only pre-release check this repo runs a real browser for:
+        builds apps/app and apps/website for web, then boots both
+        in headless Chromium over the DevTools Protocol
+        (core/tooling/tooling's `web_smoke` command) and fails on an
+        uncaught JS exception, a console error, a web splash that never
+        clears, or missing localized content — every regression of that kind found
+        only by opening the app in Chrome by hand while every other CI
+        check stayed green (a slang `lazy: true` deferred-library
+        exception on the `de` locale; flutter_native_splash's web splash
+        never removed). See `web_smoke_command.dart`'s own doc comment for
+        exactly what's asserted, including the axe-core accessibility check
+        on the semantics DOM. `.github/workflows/web-smoke.yml` runs this
+        same script in CI.
+
+    web-smoke:build-app:
+      run: >-
+        cd apps/app && flutter build web --dart-define=BACKEND=fake
+        --no-web-resources-cdn 2>&1
+      description: >-
+        Builds apps/app for web. `--no-web-resources-cdn` (default: on) is
+        the one addition over the issue's own base command: without it,
+        the CanvasKit renderer fetches canvaskit.wasm from
+        www.gstatic.com at *page load* instead of the copy `flutter build
+        web` already bundles into build/web/canvaskit/ — turning every
+        `web-smoke` run (CI included) into a real, flaky dependency on an
+        external CDN for something already sitting on disk. Not a plain
+        `flutter build web` melos-script-wide default (`icons`,
+        `check-generated` etc. never touch it) because nothing else in
+        this workspace builds a web target at all yet. `2>&1` because melos
+        labels every stderr line `ERROR:`; the exit code, not the stream,
+        decides failure.
+
+    web-smoke:run:
+      run: dart run tooling:web_smoke
+      description: >-
+        Runs the `web_smoke` command against the two builds `web-smoke`'s
+        other steps just produced. Never run on its own outside that
+        script — see `web_smoke_command.dart`'s `_requireBuilt` for the
+        clear failure if a build is missing. `--chrome <path>`/`CHROME`
+        picks the browser; defaults to the local Google Chrome.app on
+        macOS, `chromium` elsewhere (CI sets `CHROME` to a pinned Chrome for
+        Testing).
+
+    map-check:
+      run: dart run tooling:map --check
+      description: Fail if docs/map is out of date.
+
+    hooks:
+      run: git config core.hooksPath tool/hooks
+      description: Point git at the repo-managed hooks directory.
+
+    docs-check:
+      exec: dart doc -o .dart_tool/dartdoc_check --validate-links . 2>&1
+      packageFilters:
+        dirExists:
+          - lib
+      description: >-
+        Fail if a doc comment has an unresolved [Reference], or if dartdoc
+        generates a broken link — promoted from warnings to errors by each
+        package's dartdoc_options.yaml. CI-callable. `2>&1` because
+        melos labels every stderr line `ERROR:`; the exit code, not the
+        stream, decides failure. CI runs it as its own workflow,
+        `docs-check.yml`, in parallel with `ci`: `--dry-run` cannot
+        combine with `--validate-links` and saves under 5 %.
+
+    licence-check:
+      run: dart run tooling:licence_check
+      description: >-
+        Walk every `source: hosted` package across the workspace's
+        `pubspec.lock` and `core/architecture/mvc_lints/pubspec.lock`, check each
+        one's pub.dev-reported licence against the allow/deny policy
+        (`core/tooling/tooling/lib/src/licence_policy.dart`, mirroring
+        the project's dependency-licence policy) and the keyed
+        exceptions in `tool/licence-exceptions.yaml`, and fail (exit 1) on
+        any denied package. Prints every active exception on each run.
+        CI-callable.
+
+    vuln-check:
+      run: dart run tooling:vuln_check
+      description: >-
+        Ask the public OSV database (api.osv.dev, no account) about every
+        `source: hosted` package version in the workspace's `pubspec.lock`
+        and `core/architecture/mvc_lints/pubspec.lock`, and fail (exit 1) on
+        any critical or high advisory (no readable severity counts as high)
+        not covered by an unexpired entry in `tool/vuln-exceptions.yaml`, or
+        on an expired entry. Prints every active exception on each run.
+        Needs network egress to `api.osv.dev`. CI-callable (see
+        `.github/workflows/release-artifacts.yml`).
+
+    phrase-check:
+      run: dart run tooling:phrase_check
+      description: >-
+        Scan the copy sources (`apps/app` i18n JSON, the website's i18n,
+        pages and components, plus the `sources:` in `tool/phrase-check.yaml`)
+        for the forbidden phrases listed there, matched case-insensitively
+        and word-aware with German forms, and fail (exit 1) on any
+        occurrence no keyed exception covers. The template ships an empty
+        list; prints every active exception on each run. CI-callable.
+
+    changelog-check:
+      run: dart run tooling:changelog_check
+      description: >-
+        Fail if any workspace member, or `core/architecture/mvc_lints`
+        (unlisted in `workspace:` but still independently tagged — see its
+        pubspec.yaml), has no `CHANGELOG.md`. Per-package
+        Keep-a-Changelog is required from day one (`docs/releasing.md`),
+        not deferred to a package's first real release. CI-callable.
+
+    sbom:
+      run: dart run tooling:sbom
+      description: >-
+        Generate a CycloneDX 1.6 JSON SBOM for `apps/app`'s resolved
+        runtime dependency closure, written to `build/release/app/
+        sbom.cdx.json` (gitignored). Args after `--` are forwarded to
+        `tooling:sbom`, e.g. `dart run melos run sbom -- --app website`
+        for `apps/website`. See `core/tooling/tooling/lib/src/
+        sbom_command.dart` and `docs/release-artifacts.md`. CI-callable
+        (see `.github/workflows/release-artifacts.yml`).
+
+    licence-bundle:
+      run: dart run tooling:licence_bundle
+      description: >-
+        Write `THIRD_PARTY_LICENSES` for `apps/app`'s resolved runtime
+        dependency closure (every hosted package's own licence text, the
+        Flutter SDK's, and any bundled font licence) to `build/release/
+        app/THIRD_PARTY_LICENSES` (gitignored). Args after `--` are
+        forwarded to `tooling:licence_bundle`, e.g. `dart run melos run
+        licence-bundle -- --app website` for `apps/website`. See
+        `core/tooling/tooling/lib/src/licence_bundle_command.dart` and
+        `docs/release-artifacts.md`. CI-callable (see
+        `.github/workflows/release-artifacts.yml`).
+
+    test:integration:
+      run: >-
+        cd backend/appwrite/tool && dart test --tags integration
+        --run-skipped
+      description: >-
+        Runs backend/appwrite/tool/test/integration/ against the
+        Appwrite Cloud dev project in `backend/appwrite/tool/.env.local`:
+        provisions, deploys the `api` Function for real,
+        and asserts a user it executes the `delete_account` action as is
+        actually deleted. Excluded from `melos run test` by
+        backend/appwrite/tool/dart_test.yaml's tag config.
+
+    test:integration:backend_appwrite:
+      run: >-
+        cd backend/appwrite/adapters && flutter test --tags integration
+        --run-skipped
+      description: >-
+        Runs backend/appwrite/adapters/test/integration/ against the
+        Appwrite Cloud dev project in `backend/appwrite/tool/.env.local`:
+        provisions, deploys `api`, and
+        exercises the real Appwrite adapters — an admin-created user signed
+        in via an admin-issued token, document CRUD, file
+        upload/download/delete, email-code sign-in with an admin-issued
+        token, and `deleteAccount` actually removing the user. `flutter
+        test`, not `dart test`: the `appwrite` client SDK itself depends on
+        Flutter. Excluded from `melos run test` by
+        backend/appwrite/adapters/dart_test.yaml's tag config.
+
+    branch-lint:
+      run: dart run tooling:branch_lint
+      description: >-
+        Audit every local and remote branch name against the six-family
+        convention (see CLAUDE.md) — exits 1 and lists offenders.
+
+    branch-new:
+      run: dart run tooling:branch_new
+      description: >-
+        Create `.worktrees/<N>/` on a new `<family>/<N>-<slug>` branch and
+        label the GitHub issue `status/in-progress`. Args after `--`, e.g.
+        `dart run melos run branch-new -- feature 11 my-slug`. Main checkout
+        only.
+
+    finish:
+      run: dart run tooling:finish
+      description: >-
+        Merge the open PR for issue `<N>`, verify the merge landed, remove
+        the worktree and close the issue. Args after `--`, e.g.
+        `dart run melos run finish -- 11`. Main checkout only.
+
+# BSD-3-Clause. apps/app's flutter_launcher_icons 0.14.4 pins
+# `cli_util: ^0.4.1`; melos 8.9.0 (this file's own dev_dependencies, above)
+# pins `cli_util: >=0.5.0 <0.7.0` — a single-pub-resolution workspace can't
+# satisfy both without an override. Confirmed safe: flutter_launcher_icons'
+# only use of cli_util (lib/logger.dart) is the `Progress` class from
+# `cli_logging.dart`, unchanged between 0.4.1 and 0.6.0 (checked against
+# dart-lang/tools' pkgs/cli_util/lib/cli_logging.dart on its default
+# branch, which is what publishes to pub.dev now cli_util lives in that
+# monorepo). Pinned to 0.6.0 exactly, inside melos' own range, so a future
+# cli_util release can't silently widen this.
+# The only override in the workspace, and it must stay the only one.
+# flutter_launcher_icons 0.14.4 (apps/app dev dependency) pins
+# `cli_util: ^0.4.1`, melos 8.9.0 needs `>=0.5.0 <0.7.0`, and a pub
+# workspace has one resolution. flutter_launcher_icons only uses
+# `cli_logging.dart`'s `Progress`, unchanged between 0.4.1 and 0.6.0
+# (checked 2026-09-24). Remove this as soon as a flutter_launcher_icons
+# release accepts cli_util >=0.5.
+dependency_overrides:
+  cli_util: 0.6.0

@@ -1,0 +1,25 @@
+name: auth
+description: >-
+  Backend-agnostic authentication interfaces: `AuthService`, its typed
+  `AuthError` hierarchy, `AuthCapabilities` (what a given backend actually
+  supports), and an in-memory `FakeAuthService` for screens and tests.
+  `backend/appwrite/adapters` implements this against Appwrite; a cloned
+  app can swap in a different backend by implementing `AuthService` itself.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  # MIT, Dart-team-owned. Just for `@immutable` on `AuthSession` (a value
+  # type with a hand-written `==`/`hashCode` — solid_lints'
+  # `avoid_equals_and_hash_code_on_mutable_classes` wants the class marked
+  # immutable, not the override removed).
+  meta: ^1.16.0
+
+dev_dependencies:
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0

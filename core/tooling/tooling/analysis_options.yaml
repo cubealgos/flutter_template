@@ -1,0 +1,8 @@
+include: ../../../analysis_options.yaml
+
+analyzer:
+  exclude:
+    # Fixture packages with their own pubspec.yaml, used only by
+    # map_generator_test.dart via package:analyzer's parseString — never
+    # resolved or analyzed as part of this package.
+    - test/fixtures/**

@@ -1,0 +1,47 @@
+name: mvc
+description: >-
+  The template's MVC package: a vendored ValueNotifier + InheritedWidget
+  view triad (ViewModel/ViewController/ViewWidget, from sprout_state 0.3.0)
+  plus `ResponsiveLayout` (mobile/tablet/desktop layout picker with fallback)
+  and the injectable services (navigation, external-URL launching, dialogs)
+  a controller uses to reach outside itself without a view ever doing so
+  directly. Views stay dumb and navigate only through injected services; see
+  core/architecture/mvc_lints, which enforces the view boundary this package
+  is built around.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # BSD-3-Clause (verified on pub.dev, on the dependency-license allow
+  # list). Router wrapped by the default `NavigationService` implementation
+  # — this package is the only place `go_router` may be imported; a view
+  # importing it directly is a `mvc_lints/avoid_view_restricted_imports`
+  # error. Pinned to the current pub.dev release (18.0.1, Flutter
+  # 3.47.5-compatible) rather than an open caret from an older major.
+  go_router: ^18.0.1
+  # BSD-3-Clause (verified on pub.dev, on the dependency-license allow
+  # list). Wrapped by the default `LauncherService` implementation — same
+  # view-boundary reasoning as go_router above.
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # A fake `UrlLauncherPlatform` for LauncherService's test — mockito codegen
+  # isn't wired up yet, so `test/services/launcher_service_test.dart`
+  # hand-writes a fake against this platform interface instead of a real
+  # mock.
+  url_launcher_platform_interface: ^2.3.2
+  # Own copy for the same reason every other workspace member declares one:
+  # this package's analysis_options.yaml `include: ../../analysis_options.yaml`
+  # chain reaches the root's `very_good_analysis` pin through the workspace's
+  # single shared pub resolution, not through a direct dependency of its own
+  # — see the root pubspec.yaml for the fuller explanation.
+  very_good_analysis: ^11.0.0
+
+flutter:

@@ -1,0 +1,38 @@
+name: appwrite_tool
+description: >-
+  Provisioning and deployment tooling for the template's Appwrite backend:
+  `bin/provision.dart` (idempotent schema provisioning), `bin/deploy.dart`
+  (vendors and deploys a Function) and `bin/seed_review_demo_account.dart`
+  (seeds the App Review demo account). See `backend/appwrite/README.md`.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  appwrite_schema:
+    path: ../schema
+  # tar.gz staging for `bin/deploy.dart` — pure Dart, no system `tar`
+  # binary required (the deploy host may not have one, and shelling out to
+  # an external tool for something a library already does well is exactly
+  # the kind of dependency worth taking over reinventing it).
+  archive: ^4.0.7
+  dart_appwrite: ^29.0.0
+  # Raw REST calls for Function create/update only — dart_appwrite 29.0.0's
+  # typed `Functions.create`/`update` require an `enums.Runtime` value, and
+  # that enum (generated from Appwrite Cloud's catalog) originally lacked the
+  # template's runtime; 29.0.0 now has `dart312` (the runtime the template
+  # uses), so this workaround is no longer required but is kept. See
+  # `lib/src/dart_appwrite_admin.dart`. Already a transitive dependency of
+  # dart_appwrite itself (`http: >=0.13.6 <2.0.0`), so this adds no new
+  # licence surface.
+  http: ^1.2.2
+  path: ^1.9.0
+  yaml: ^3.1.2
+
+dev_dependencies:
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0

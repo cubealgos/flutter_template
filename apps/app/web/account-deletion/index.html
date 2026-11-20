@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!--
+  A static, no-build account-deletion request page, shipped alongside the
+  Flutter web build (see the root README's web-build docs and the plan's
+  "Settings → Account" default screen). Google Play's Data safety /
+  Account deletion requirements ask for a deletion path reachable without
+  installing the app or signing in — this page is that path.
+
+  The in-app flow (Settings → Account → Delete account, see
+  AccountSettingsController.confirmAndDeleteAccount) already deletes the
+  account immediately, with no ticket step. This page exists for someone
+  who can't or won't install the app: it is a *request* form the legal
+  contact below fulfils by hand, not a second deletion mechanism — this
+  template ships no unauthenticated way to delete an arbitrary account
+  from a plain web page, which would itself be a security hole.
+
+  The contact address below is AppConfig's own placeholder
+  (`legalContactEmail`, 'legal@example.com') — kept in sync by
+  test/web/account_deletion_page_test.dart, which fails if this file's
+  contact address and AppConfig's default ever drift apart. A cloned app
+  replaces both together.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Request account deletion</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --fg: #1a1a1a;
+        --bg: #ffffff;
+        --muted: #555555;
+        --accent: #2952cc;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fg: #f2f2f2;
+          --bg: #121212;
+          --muted: #bbbbbb;
+          --accent: #7ea0ff;
+        }
+      }
+      body {
+        margin: 0;
+        padding: 2rem 1rem;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        line-height: 1.5;
+      }
+      main {
+        max-width: 40rem;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      p.notice {
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--muted);
+        border-radius: 0.5rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      a {
+        color: var(--accent);
+      }
+      lang-de {
+        display: block;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="notice">
+        TEMPLATE TEXT — replace with your own lawyer-reviewed text before
+        shipping. Placeholder contact shown below.
+      </p>
+
+      <h1>Request account deletion</h1>
+      <p>
+        You can delete your account instantly from inside the app, at any
+        time, with no waiting period and no need to open a support ticket:
+        go to <strong>Settings → Account → Delete account</strong> and
+        confirm.
+      </p>
+      <p>
+        If you can't install or sign in to the app, email
+        <a href="mailto:legal@example.com">legal@example.com</a> from the
+        address on the account and ask for it to be deleted. We will
+        confirm once it's done.
+      </p>
+      <p>
+        Deleting your account removes your account record and every row
+        and file associated with it. This can't be undone.
+      </p>
+
+      <lang-de lang="de">
+        <h1>Löschung des Kontos beantragen</h1>
+        <p>
+          Du kannst dein Konto jederzeit direkt in der App löschen — ohne
+          Wartezeit und ohne Support-Ticket: gehe zu
+          <strong>Einstellungen → Konto → Konto löschen</strong> und
+          bestätige.
+        </p>
+        <p>
+          Falls du die App nicht installieren oder dich nicht anmelden
+          kannst, schreibe eine E-Mail an
+          <a href="mailto:legal@example.com">legal@example.com</a> von der
+          mit dem Konto verknüpften Adresse und bitte um die Löschung. Wir
+          bestätigen, sobald sie erledigt ist.
+        </p>
+        <p>
+          Beim Löschen deines Kontos werden dein Kontodatensatz und alle
+          damit verbundenen Datensätze und Dateien entfernt. Dies kann
+          nicht rückgängig gemacht werden.
+        </p>
+      </lang-de>
+    </main>
+  </body>
+</html>

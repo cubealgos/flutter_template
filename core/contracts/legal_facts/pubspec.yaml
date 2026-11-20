@@ -1,0 +1,21 @@
+name: legal_facts
+description: >-
+  The template's placeholder legal-entity facts (company name, address,
+  commercial register entry, VAT ID, contact email, responsible person,
+  supervisory authority) as one pure-Dart, Flutter-free source. `apps/app`'s `AppConfig` reads these as its `legal*` fields'
+  defaults, and `apps/website`'s Impressum/Datenschutz pages read them
+  directly, so the two can never drift the way a duplicated
+  `LegalPlaceholders` class did before. Every value is an **obvious
+  placeholder**: a cloned app must replace every field with its own
+  lawyer-reviewed facts before shipping.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dev_dependencies:
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0

@@ -1,0 +1,95 @@
+{
+  "stroke": {
+    "thin": {
+      "$type": "dimension",
+      "$value": "1px",
+      "$description": "Decorative/non-interactive strokes — hairlines, static card borders, dividers (app-design spec §1.4: simplified to a flat 1px, dropping the 0.8px diagram-tool value that existed only for sub-pixel leaf-node outlines)."
+    },
+    "default": {
+      "$type": "dimension",
+      "$value": "1px",
+      "$description": "Most strokes — same 1px decorative value as `thin` (app-design spec §1.4 collapses the old three-step 0.8/1/1.2px ramp to a plain decorative/interactive pair)."
+    },
+    "strong": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Interactive strokes — focus rings, hover/focus/error borders, checked/selected states (app-design spec §1.4: 2px, up from 1.2px — the old value only had to survive the website's now-removed cut-corner notch shape at fractional-pixel rendering)."
+    }
+  },
+  "radius": {
+    "sm": {
+      "$type": "dimension",
+      "$value": "0px",
+      "$description": "Square corners everywhere (app-design spec §1.4) — no rounding, kept as a token (not deleted) so a future true circle still has `full` to reach for and every consumer keeps calling `.borderRadiusAll(radiusSm())` unchanged."
+    },
+    "md": {
+      "$type": "dimension",
+      "$value": "0px",
+      "$description": "Square corners everywhere (app-design spec §1.4). See `radius.sm`."
+    },
+    "lg": {
+      "$type": "dimension",
+      "$value": "0px",
+      "$description": "Square corners everywhere (app-design spec §1.4). See `radius.sm`."
+    },
+    "full": {
+      "$type": "dimension",
+      "$value": "9999px",
+      "$description": "The one deliberate exception to `radius.*: 0` — true circles only (avatars, status dots), app-design spec §1.4."
+    }
+  },
+  "grid": {
+    "unit": {
+      "$type": "dimension",
+      "$value": "4px",
+      "$description": "Every coord, size, and gap divisible by this — hard rule, matches diagram-design's own grid constraint"
+    }
+  },
+  "space": {
+    "1": {
+      "$type": "dimension",
+      "$value": "4px",
+      "$description": "1x grid.unit. Icon padding, tight inline gaps."
+    },
+    "2": {
+      "$type": "dimension",
+      "$value": "8px",
+      "$description": "2x grid.unit. Default inline gap."
+    },
+    "3": {
+      "$type": "dimension",
+      "$value": "12px",
+      "$description": "3x grid.unit. Comfortable inline gap, form field padding."
+    },
+    "4": {
+      "$type": "dimension",
+      "$value": "16px",
+      "$description": "4x grid.unit. Default block gap, card padding."
+    },
+    "6": {
+      "$type": "dimension",
+      "$value": "24px",
+      "$description": "6x grid.unit. Grouped-content gap."
+    },
+    "8": {
+      "$type": "dimension",
+      "$value": "32px",
+      "$description": "8x grid.unit. Section padding."
+    },
+    "12": {
+      "$type": "dimension",
+      "$value": "48px",
+      "$description": "12x grid.unit. Section gap."
+    },
+    "16": {
+      "$type": "dimension",
+      "$value": "64px",
+      "$description": "16x grid.unit. Page-level gap."
+    },
+    "24": {
+      "$type": "dimension",
+      "$value": "96px",
+      "$description": "24x grid.unit. Landing-section block padding, incl. the hero's — matches the reference site's `--space-9`. A hero that sits under a `position: fixed` nav (which overlays page content) needs a much larger top padding (192px) to clear it; this template's nav is `position: sticky` (in-flow, not overlaying), so the hero needs only the ordinary section padding, not an extra nav-clearing allowance."
+    }
+  }
+}

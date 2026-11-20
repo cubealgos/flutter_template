@@ -1,0 +1,26 @@
+name: data
+description: >-
+  Backend-agnostic data interfaces: `DocumentRepository` (per-collection
+  document CRUD, scoped to the current user or, with a `TeamScope`, to a team), `StorageService`
+  (per-user file upload/download/delete), `UserPreferences` (per-user
+  key/value prefs) and `VersionPolicy` (minimum-supported-version check),
+  plus in-memory fakes for screens and tests. `backend/appwrite/adapters`
+  implements all four against Appwrite's `TablesDB`, `Storage` and
+  `Account` services.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  # `FakeDocumentRepository` asks a `TeamDirectory` which roles a user holds
+  # in a team, to mirror Appwrite's team-scoped row visibility.
+  teams:
+    path: ../teams
+
+dev_dependencies:
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0

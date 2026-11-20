@@ -1,0 +1,7 @@
+dartdoc:
+  # Promote a `[Reference]` that doesn't resolve, or a link dartdoc itself
+  # generates to something that doesn't exist, from a warning to a build
+  # failure — see the `docs-check` melos script in the root pubspec.yaml.
+  errors:
+    - unresolved-doc-reference
+    - broken-link

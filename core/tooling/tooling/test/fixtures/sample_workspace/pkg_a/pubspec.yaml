@@ -1,0 +1,7 @@
+name: pkg_a
+description: A sample fixture package used by map_generator_test.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0

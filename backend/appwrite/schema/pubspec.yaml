@@ -1,0 +1,23 @@
+name: appwrite_schema
+description: >-
+  The template's declarative Appwrite backend schema (database, tables,
+  columns, buckets and Functions). Zero dependencies on purpose: shared by
+  both `appwrite_tool` (provisioning/deployment tooling) and
+  `backend/appwrite/functions/delete_account`, without the function's
+  deployed bundle also vendoring appwrite_tool's own tooling-only
+  dependencies.
+publish_to: none
+resolution: workspace
+
+environment:
+  # Deliberately below the workspace's own ^3.13.0 (see root pubspec.yaml):
+  # this package is bundled as a path dependency into the Appwrite Function
+  # bundles, which build on Cloud's newest Dart runtime, `dart-3.12`.
+  sdk: ^3.12.0
+
+# Lints come from very_good_analysis, declared once in the workspace root
+# pubspec.yaml and reached via this package's `analysis_options.yaml`
+# `include: ../../../analysis_options.yaml` chain (see the root file). The
+# only dev dependency is `test`, for the schema declaration's own test.
+dev_dependencies:
+  test: ^1.25.0

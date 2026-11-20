@@ -1,0 +1,15 @@
+# Sample phrase list used only by phrase_check_command_test.dart's
+# deliberate-break test. The template's own tool/phrase-check.yaml stays
+# empty.
+phrases:
+  - barrierefrei
+  - rechtssicher
+  - "KI-gestützt"
+  - BFSG-konform
+sources:
+  - extra
+exceptions:
+  - phrase: barrierefrei
+    sentence: "Diese Seite ist nicht barrierefrei zertifiziert."
+    reason: "Negates the claim."
+    date: "2026-01-31"

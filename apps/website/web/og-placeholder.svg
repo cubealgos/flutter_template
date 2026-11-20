@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Your Product">
+  <rect width="1200" height="630" fill="#f5f5f5"/>
+  <rect x="80" y="80" width="1040" height="470" fill="#ffffff" stroke="#bfc0c0" stroke-width="2"/>
+  <rect x="140" y="255" width="120" height="120" fill="#1d6fe0"/>
+  <text x="300" y="330" font-family="sans-serif" font-size="64" fill="#2d3142">Your Product</text>
+</svg>

@@ -1,0 +1,33 @@
+{
+  "motion": {
+    "duration": {
+      "default": {
+        "$type": "duration",
+        "$value": "{motion.duration.step}",
+        "$description": "The ordinary transition. Named `default` by the contract; `step` is the diagram vocabulary for the same value."
+      },
+      "slow": {
+        "$type": "duration",
+        "$value": "{motion.duration.hold}",
+        "$description": "A deliberate, noticeable transition."
+      }
+    },
+    "easing": {
+      "standard": {
+        "$type": "cubicBezier",
+        "$value": "{motion.ease.standard}",
+        "$description": "Default easing. The contract spells this group `easing`; `ease` is the diagram vocabulary for the same curve."
+      },
+      "emphasized": {
+        "$type": "cubicBezier",
+        "$value": [
+          0.05,
+          0.7,
+          0.1,
+          1
+        ],
+        "$description": "For motion that should feel decisive \u2014 an element entering from off-screen, a sheet arriving. Accelerates harder and settles later than `standard`. Not an alias: no existing curve carried this meaning."
+      }
+    }
+  }
+}

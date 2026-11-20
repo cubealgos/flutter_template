@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=app
+Exec=app
+Icon=com.example.app
+Terminal=false
+Categories=Utility;

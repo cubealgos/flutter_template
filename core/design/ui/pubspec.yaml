@@ -1,0 +1,62 @@
+name: ui
+description: >-
+  The template's headless component library: generated design tokens
+  (`lib/src/tokens.g.dart`, built from `tokens/*.json` by
+  `package:tokens_builder`), an `AppTheme` widget that wires them into a
+  `package:mix` `MixScope`, and a small set of accessible components
+  (Button, TextField, Checkbox, Dialog, Sheet, ListTile) built on
+  `package:mix` + `package:naked_ui`. Deliberately has no `material.dart`
+  import anywhere — every component is headless, styled only through mix.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # BSD-3-Clause (verified on pub.dev 2026-09-24, on the dependency-license
+  # allow list). Style/token engine: `MixScope`, typed tokens
+  # (`ColorToken`/`SpaceToken`/`RadiusToken`/`TextStyleToken`/…),
+  # `BoxStyler`/`TextStyler`. `tokens.g.dart` is generated against this
+  # package's 2.2.0 token API — see core/design/tokens_builder.
+  mix: ^2.2.0
+  # BSD-3-Clause (verified on pub.dev 2026-09-24, on the dependency-license
+  # allow list). Headless (no Material/Cupertino) interaction primitives —
+  # NakedButton, NakedCheckbox, NakedTextField, NakedDialog/NakedMenu, etc.
+  # — that this package styles with mix instead of adopting Material's
+  # look.
+  naked_ui: ^1.0.1
+
+dev_dependencies:
+  # Pinned to match packages/domain and core/design/tokens_builder's pin —
+  # see their pubspec.yaml doc-comments; one workspace, one resolution.
+  build_runner: 2.15.1
+  flutter_test:
+    sdk: flutter
+  tokens_builder:
+    path: ../tokens_builder
+  # Own copy for the same reason every other workspace member declares one
+  # — see the root pubspec.yaml.
+  very_good_analysis: ^11.0.0
+
+flutter:
+  # Self-hosted brand type — OFL-1.1, the same two families the
+  # website's `web/fonts/` self-hosts via `@font-face`; see
+  # `tool/font-licences.md` for the licence record (the licence-check gate
+  # only walks pub packages, so font assets are out of its scope — noted
+  # there explicitly). `tokens.g.dart`'s `fontFamilyTitle`/`fontFamilyBody`/
+  # `fontFamilyMono` name these same family strings.
+  fonts:
+    - family: Host Grotesk
+      fonts:
+        # Variable font (wght 300-800) — a single asset entry is enough;
+        # Flutter resolves any requested FontWeight against the axis.
+        - asset: assets/fonts/host-grotesk/HostGrotesk-wght.ttf
+    - family: IBM Plex Mono
+      fonts:
+        - asset: assets/fonts/ibm-plex-mono/IBMPlexMono-Regular.ttf
+  assets:
+    - assets/fonts/host-grotesk/OFL.txt
+    - assets/fonts/ibm-plex-mono/OFL.txt

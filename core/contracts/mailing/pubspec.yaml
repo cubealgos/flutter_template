@@ -1,0 +1,28 @@
+name: mailing
+description: >-
+  Backend-agnostic transactional and notification email: `Mailer` (send a
+  templated mail to a user with a locale, an idempotency key, headers and a
+  delivery result), `MailerEngine` (the one implementation of the rules over a
+  `MailStore` and a `MailTransport`), `MailCatalog` (de/en templates, pure
+  Dart), `UnsubscribeLinks` (signed, expiring one-click links) and an
+  in-memory `FakeMailer` for tests. `backend/appwrite/functions/api` runs the
+  engine on Appwrite Messaging and direct SMTP.
+publish_to: none
+resolution: workspace
+
+environment:
+  # Deliberately below the workspace's own ^3.13.0 (see root pubspec.yaml):
+  # `backend/appwrite/functions/api` depends on this package and builds on
+  # Appwrite Cloud's `dart-3.12` runtime, like `jobs` and `teams`.
+  sdk: ^3.12.0
+
+dependencies:
+  # BSD-3-Clause (dart.dev): HMAC-SHA-256 for the signed unsubscribe links and
+  # SHA-256 for the delivery-record key, as `RateLimiter` in `api` uses it.
+  crypto: ^3.0.7
+
+dev_dependencies:
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0

@@ -1,0 +1,58 @@
+name: domain
+description: >-
+  Pure-Dart models shared by the app and the Appwrite Functions in
+  `backend/appwrite/functions/`. No Flutter dependency — this package is bundled
+  as a path dependency into deployed function bundles (see
+  `backend/appwrite/tool/bin/deploy.dart`), where only a plain Dart runtime is available.
+publish_to: none
+resolution: workspace
+
+environment:
+  # Deliberately below the workspace's own ^3.13.0 (see root pubspec.yaml):
+  # a package's `environment: sdk:` lower bound sets its *language
+  # version*, and freezed 3.2.5's generated code for any List/Map/Set
+  # field (`@Default`'d or not) emits a bare `final` on a non-`this.`
+  # constructor parameter, which Dart 3.13's primary-constructor grammar
+  # rejects (`extraneous_modifier: Can't have modifier 'final' here.` —
+  # note `dart analyze` does NOT catch this on its own, since generated
+  # files are excluded from analysis; it only surfaces when the code is
+  # actually compiled, e.g. by `dart test` or `dart compile exe`).
+  # Reproduced by hand 2026-09-23 in a scratch copy of this package: at
+  # `^3.13.0` with no pragma, build_runner's output fails to compile; at
+  # `^3.12.0`, it builds and `dart test` passes. No freezed release newer
+  # than 3.2.5 exists on the `analyzer <11.0.0` line this workspace needs
+  # (freezed 4 requires analyzer >=14, blocked by Flutter 3.47.5's
+  # `flutter_test` pinning `test_api` to a version that excludes it — see
+  # CLAUDE.md's "Toolchain" row). Revert to `^3.13.0` once freezed >=4 is
+  # usable here. Every freezed-using package in this workspace needs this
+  # same pin, not just this one — see CLAUDE.md.
+  sdk: ^3.12.0
+
+dependencies:
+  freezed_annotation: 3.1.0
+  # json_serializable 6.14.1 (below) requires json_annotation
+  # `>=4.12.0 <4.13.0` exactly — a looser constraint here (e.g. `^4.9.0`)
+  # still resolves correctly but prints a build_runner warning every run.
+  json_annotation: '>=4.12.0 <4.13.0'
+
+dev_dependencies:
+  # Pinned below 2.15.2: that release (and every one after it, checked up to
+  # the current 2.16.1) bumped build_runner's own `analyzer` dependency
+  # straight to `>=13.3.0 <15.0.0`, which conflicts with freezed 3.2.5's
+  # `analyzer: >=9.0.0 <11.0.0` ceiling below — 2.15.1 is the newest release
+  # still on `analyzer: >=8.0.0 <14.0.0`, compatible with the workspace's
+  # resolved analyzer 10.x line (see root pubspec.yaml's doc comment).
+  build_runner: 2.15.1
+  # Pinned to the analyzer 10.x line this workspace resolves to (see the
+  # root pubspec.yaml `melos:` doc-comment and CLAUDE.md's "Toolchain" row):
+  # freezed 3.2.5 depends on `analyzer: >=9.0.0 <11.0.0`, which is what pulls
+  # the whole workspace down from analyzer 13.x to 10.x the moment this
+  # package is added as a workspace member. Pinned explicitly (not `^3.2.5`)
+  # so a future freezed patch release can't silently change that ceiling
+  # without a deliberate version bump here.
+  freezed: 3.2.5
+  json_serializable: 6.14.1
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Legal hub</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@300..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --ground: #F5F6FA;
+  --surface: #FFFFFF;
+  --edge: #AEB8CA;
+  --ink: #12151C;
+  --muted: #5B6478;
+  --signal: #3B4FE0;
+  --signal-light: #2A3BC7;
+  --on-signal: #FFFFFF;
+  --danger: #B3261E;
+  --success: #1E7A34;
+  --warning: #8A5300;
+  --scrim: rgba(245,246,250,0.72);
+}
+body { margin: 0; background: var(--ground); }
+
+* { box-sizing: border-box; border-radius: 0; }
+.chip-dot, .checkbox-box.circle { border-radius: 50%; }
+html, body { margin: 0; padding: 0; }
+.root { font-family: 'Host Grotesk', system-ui, sans-serif; }
+.mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+
+.t-display { font: 700 32px/1.1 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--ink); }
+.t-h1 { font: 700 24px/1.2 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--ink); }
+.t-h2 { font: 700 20px/1.3 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--ink); }
+.t-h3 { font: 600 16px/1.3 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--ink); }
+.t-body { font: 400 16px/1.6 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--ink); }
+.t-body-sm { font: 400 14px/1.5 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--ink); }
+.t-body-sm-muted { font: 400 14px/1.5 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--muted); }
+.t-caption { font: 400 12px/1.5 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--muted); }
+.t-eyebrow { font: 600 14px/1.4 'Host Grotesk', system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.04em; margin: 0; color: var(--muted); }
+.t-eyebrow-signal { font: 600 14px/1.4 'Host Grotesk', system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.04em; margin: 0; color: var(--signal-light); }
+.t-mono { font: 400 16px/1.4 'IBM Plex Mono', ui-monospace, monospace; margin: 0; color: var(--ink); }
+
+a { color: var(--signal-light); }
+a:hover { text-decoration: none; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 24px; font: 600 16px/1 'Host Grotesk', system-ui, sans-serif; border: 1px solid transparent; text-decoration: none; cursor: pointer; box-sizing: border-box; border-radius: 0; }
+.btn-block { width: 100%; }
+.btn-primary { background: var(--signal); color: var(--on-signal); border-color: var(--signal); }
+.btn-secondary { background: transparent; color: var(--ink); border: 1px solid var(--edge); }
+.btn-destructive { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+.btn-destructive-filled { background: var(--danger); color: var(--ground); border-color: var(--danger); }
+.btn-sm { min-height: 44px; padding: 0 16px; font-size: 14px; }
+.btn-link { background: none; border: none; padding: 0; min-height: auto; color: var(--signal-light); font: 600 14px 'Host Grotesk', system-ui, sans-serif; text-decoration: underline; cursor: pointer; }
+.btn-icon { width: 44px; height: 44px; padding: 0; background: transparent; border: 1px solid transparent; color: var(--ink); flex-shrink: 0; }
+.btn:disabled, .btn-disabled { opacity: 0.45; cursor: not-allowed; }
+.btn:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+.btn-focused { outline: 2px solid var(--signal); outline-offset: 2px; }
+
+.btn-row { display: flex; gap: 16px; }
+.btn-row .btn { flex: 1 1 0; }
+
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field-label { font: 600 14px/1.3 'Host Grotesk', system-ui, sans-serif; color: var(--ink); }
+.field input { box-sizing: border-box; width: 100%; height: 48px; padding: 0 16px; font: 400 16px 'Host Grotesk', system-ui, sans-serif; color: var(--ink); background: var(--surface); border: 1px solid var(--edge); border-radius: 0; }
+.field input.mono-input { font-family: 'IBM Plex Mono', ui-monospace, monospace; letter-spacing: 0.12em; }
+.field input:focus { outline: 2px solid var(--signal); outline-offset: 2px; border-color: var(--signal); }
+.field input.input-focused { outline: 2px solid var(--signal); outline-offset: 2px; border-color: var(--signal); }
+.field input.input-error { border: 2px solid var(--danger); }
+.field-hint { font: 400 14px/1.5 'Host Grotesk', system-ui, sans-serif; color: var(--muted); margin: 0; }
+.field-error { font: 400 14px/1.5 'Host Grotesk', system-ui, sans-serif; color: var(--danger); margin: 0; }
+
+.header { display: flex; align-items: center; gap: 4px; min-height: 56px; }
+.header .t-h1 { flex: 1 1 auto; }
+
+.list { display: flex; flex-direction: column; border-top: 1px solid var(--edge); }
+.list-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; padding: 12px 16px; border-bottom: 1px solid var(--edge); text-decoration: none; color: var(--ink); background: transparent; }
+.list-row-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.list-row-title { font: 400 16px/1.4 'Host Grotesk', system-ui, sans-serif; color: var(--ink); }
+.list-row-title-mono { font: 400 15px/1.4 'IBM Plex Mono', ui-monospace, monospace; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list-row-sub { font: 400 14px/1.4 'Host Grotesk', system-ui, sans-serif; color: var(--muted); }
+.chevron { color: var(--muted); flex-shrink: 0; }
+
+.checkbox-row { display: flex; align-items: center; gap: 12px; min-height: 44px; }
+.checkbox-box { width: 24px; height: 24px; border: 2px solid var(--edge); flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--on-signal); border-radius: 0; }
+.checkbox-box.checked { background: var(--signal); border-color: var(--signal); }
+.checkbox-label { font: 400 16px/1.4 'Host Grotesk', system-ui, sans-serif; color: var(--ink); }
+.checkbox-label.done { color: var(--muted); text-decoration: line-through; }
+
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid var(--edge); width: fit-content; }
+.chip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.chip-text { font: 600 14px/1.2 'Host Grotesk', system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+.chip.success { border-color: var(--success); }
+.chip.success .chip-dot { background: var(--success); }
+.chip.success .chip-text { color: var(--success); }
+.chip.danger { border-color: var(--danger); }
+.chip.danger .chip-dot { background: var(--danger); }
+.chip.danger .chip-text { color: var(--danger); }
+.chip.muted .chip-dot { background: var(--muted); }
+.chip.muted .chip-text { color: var(--muted); }
+
+.divider { height: 1px; background: var(--edge); border: none; margin: 0; width: 100%; }
+
+.code-block { background: var(--surface); border: 1px solid var(--edge); padding: 16px; font: 400 13px/1.6 'IBM Plex Mono', ui-monospace, monospace; color: var(--ink); white-space: pre; overflow: auto; }
+
+.fact-row { display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-bottom: 1px solid var(--edge); }
+.fact-row:first-child { border-top: 1px solid var(--edge); }
+.fact-label { font: 600 12px/1.4 'Host Grotesk', system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.fact-value { font: 400 16px/1.5 'Host Grotesk', system-ui, sans-serif; color: var(--ink); }
+
+.dialog-card { background: var(--surface); border: 1px solid var(--edge); padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.scrim { position: absolute; inset: 0; background: var(--scrim); }
+
+.provider-mark { width: 44px; height: 44px; border: 1px solid var(--edge); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font: 600 15px 'Host Grotesk', system-ui, sans-serif; color: var(--muted); }
+
+
+</style>
+</helmet>
+<div class="root" style="width: 390px; height: 820px; background: var(--ground); position: relative; overflow: visible;">
+<div style="display:flex;flex-direction:column;height:100%;padding:16px;gap:24px;justify-content:flex-start;">
+<div class="header">
+  <a href="#" class="btn btn-icon" aria-label="Back" onclick="return false;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+  <h1 class="t-h1">Legal</h1>
+  
+</div>
+<div class="list">
+<a href="#" class="list-row" onclick="return false;">
+  <span class="list-row-main"><span class="list-row-title">Impressum</span></span>
+  <span style="display:flex;align-items:center;gap:12px;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="chevron"><path d="M9 18l6-6-6-6"/></svg></span>
+</a>
+
+<a href="#" class="list-row" onclick="return false;">
+  <span class="list-row-main"><span class="list-row-title">Datenschutz (Privacy Policy)</span></span>
+  <span style="display:flex;align-items:center;gap:12px;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="chevron"><path d="M9 18l6-6-6-6"/></svg></span>
+</a>
+
+<a href="#" class="list-row" onclick="return false;">
+  <span class="list-row-main"><span class="list-row-title">AGB (Terms &amp; Conditions)</span></span>
+  <span style="display:flex;align-items:center;gap:12px;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="chevron"><path d="M9 18l6-6-6-6"/></svg></span>
+</a>
+
+<a href="#" class="list-row" onclick="return false;">
+  <span class="list-row-main"><span class="list-row-title">Barrierefreiheit (Accessibility)</span></span>
+  <span style="display:flex;align-items:center;gap:12px;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="chevron"><path d="M9 18l6-6-6-6"/></svg></span>
+</a>
+
+<a href="#" class="list-row" onclick="return false;">
+  <span class="list-row-main"><span class="list-row-title">Open-source licences</span></span>
+  <span style="display:flex;align-items:center;gap:12px;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="chevron"><path d="M9 18l6-6-6-6"/></svg></span>
+</a>
+</div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":820}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

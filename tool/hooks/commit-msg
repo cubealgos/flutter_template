@@ -1,0 +1,2 @@
+#!/bin/sh
+exec fvm dart run tooling:commit_msg "$1"

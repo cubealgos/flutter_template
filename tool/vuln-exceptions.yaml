@@ -1,0 +1,20 @@
+# Keyed, time-boxed exceptions for `melos run vuln-check` (core/tooling/tooling's
+# `vuln_check`, which asks the public OSV database about every resolved hosted
+# package version and fails on critical/high advisories).
+#
+# Every entry accepts ONE advisory against ONE package, never a blanket
+# allowance, and it EXPIRES: an entry past its `expires` date (inclusive) stops
+# covering anything and fails the check by itself until it is renewed (with a
+# fresh reason) or removed. Every entry is printed on every run.
+#
+#   - package: some_package
+#     advisory: GHSA-xxxx-xxxx-xxxx   # the OSV id, or one of its aliases (CVE-...)
+#     reason: "Why this is safe here: not reachable, mitigated, no fix yet."
+#     date: "2026-10-01"              # granted, YYYY-MM-DD, quoted
+#     expires: "2026-12-31"           # last day it applies, YYYY-MM-DD, quoted
+#
+# Severity rule (see `advisory_severity.dart`): the highest of the CVSS v3
+# base score (>=9.0 critical, >=7.0 high) and OSV's severity labels; an
+# advisory with no readable severity counts as high. Medium/low are listed,
+# never failing.
+exceptions: []

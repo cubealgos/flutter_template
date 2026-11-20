@@ -1,0 +1,36 @@
+name: tooling
+description: Repo tooling for the flutter_template workspace (commit-msg rule, history lint, docs map generator).
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  analyzer: '>=10.0.0 <15.0.0'
+  # MIT. sha256 verification of a `ChromeFetchCommand` download against
+  # its pinned hash — streamed over the downloaded bytes rather than
+  # shelling out to `sha256sum`, so it's testable without a real process.
+  crypto: ^3.0.7
+  http: ^1.2.0
+  # MIT. Pure-Dart image decode/encode/resize used by the `icons`
+  # command to fill the gaps flutter_launcher_icons/flutter_native_splash
+  # leave: favicon.ico (multi-size, via IcoEncoder.encodeImages),
+  # apple-touch-icon.png and the Linux icon PNGs. No `analyzer` dependency
+  # of its own (checked its pubspec.yaml), so it can't move the workspace's
+  # analyzer 10.x-13.x resolution.
+  image: ^4.10.1
+  path: ^1.9.0
+  yaml: ^3.1.2
+
+dev_dependencies:
+  # Test-only: governance_files_test.dart reads the root LICENSE/NOTICE/
+  # CLA.md/SECURITY.md and checks they quote the same placeholder values
+  # as LegalFacts rather than hand-duplicating the constants and
+  # risking the two drifting apart.
+  legal_facts:
+    path: ../../contracts/legal_facts
+  # Lints come from very_good_analysis, declared once in the workspace root
+  # pubspec.yaml and reached via this package's `analysis_options.yaml`
+  # `include: ../../analysis_options.yaml` chain (see the root file).
+  test: ^1.25.0

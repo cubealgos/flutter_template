@@ -1,0 +1,52 @@
+# FVM
+.fvm/
+
+# Per-issue worktrees (see CLAUDE.md)
+.worktrees/
+
+# Dart / Flutter
+.dart_tool/
+.packages
+build/
+pubspec_overrides.yaml
+*.iml
+*.class
+
+# Flutter platform build artifacts
+**/android/.gradle/
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/app/debug
+**/android/app/profile
+**/android/app/release
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/ephemeral/
+**/macos/Flutter/ephemeral/
+**/macos/Pods/
+**/Flutter/ephemeral/
+**/linux/flutter/ephemeral/
+**/windows/flutter/ephemeral/
+**/web/flutter_service_worker.js
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+
+# Backend secrets — never committed. See backend/appwrite/tool/.env.example for the gitignored file this is.
+backend/appwrite/tool/.env.local
+# The production project's config (see docs/releasing.md "Deploying") — same rule.
+backend/appwrite/tool/.env.production.local

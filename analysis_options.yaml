@@ -1,0 +1,150 @@
+# See CLAUDE.md's "Lint + dartdoc enforcement" row for the full story
+# Base: very_good_analysis (MIT, ~200 rules incl.
+# `public_member_api_docs`, applied everywhere — apps included; apps may
+# relax after cloning). Plugins (see `plugins:` below): solid_lints (MIT,
+# complexity/size/style thresholds) and this repo's own `core/architecture/mvc_lints`
+# (MVC view-boundary rules).
+include: package:very_good_analysis/analysis_options.yaml
+
+# Analyzer plugins, new in Dart 3.10 (`package:analysis_server_plugin`).
+# These are resolved by the Dart analysis server into a synthetic package
+# under `~/.dartServer/.plugin_manager/<hash>/`, via its own `dart pub
+# upgrade` — never into this workspace's own `dart pub get`. That is what
+# lets solid_lints (analyzer ^14.1.0) and core/architecture/mvc_lints (also analyzer
+# ^14.1.0, see its pubspec.yaml) exist alongside the workspace's own
+# deliberate analyzer 10.x-13.x pin (Flutter 3.47.5's flutter_test pins
+# test_api 0.7.12; mix_generator will cap analyzer <11 later) without any
+# version conflict. Verified against
+# https://dart.dev/tools/analyzer-plugins and
+# https://github.com/dart-lang/sdk/blob/main/pkg/analysis_server_plugin/doc/using_plugins.md
+# and by inspecting `~/.dartServer/.plugin_manager/` after running
+# `dart analyze` with this file in place; `dart pub deps`
+# shows that the workspace resolution is unaffected.
+# To suppress a plugin-contributed diagnostic inline, the bare rule name in
+# `// ignore: <rule>` is NOT enough — namespace it `<plugin>/<rule>`, e.g.
+# `// ignore: solid_lints/avoid_non_null_assertion` (confirmed by hand). The
+# `mvc_lints` plugin's own rules would namespace as `mvc_lints/<rule>`.
+plugins:
+  solid_lints: ^1.0.0
+  mvc_lints:
+    path: core/architecture/mvc_lints
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.gr.dart"
+    - "**/*.config.dart"
+    - "**/*.mocks.dart"
+    - "**/generated/**"
+    # This package deliberately has its own, isolated pub resolution (see
+    # its pubspec.yaml) and its own `dart analyze` / `dart test` run — it is
+    # never a workspace member, so excluding it here just keeps a stray
+    # bare `dart analyze .` at the repo root from trying (and failing) to
+    # resolve its analyzer ^14.1.0 dependency against this file's plugins.
+    - "core/architecture/mvc_lints/**"
+    # Sibling git worktrees (CLAUDE.md "Branches") live under the main
+    # checkout; a root `dart analyze` there must never descend into them.
+    - ".worktrees/**"
+
+linter:
+  rules:
+    # Dart 3.13's primary-constructor syntax (`class const MyApp({super.key})
+    # extends StatelessWidget`) is very new, and `public_member_api_docs`
+    # doesn't yet reliably recognize a doc comment on the class as covering
+    # the folded-in constructor too (tried it: the doc comment directly
+    # above a primary constructor still gets flagged as missing). Rather
+    # than fight that interaction across every widget in the repo, this
+    # repo keeps conventional explicit constructors for now and turns the
+    # nudge-to-primary-constructors rule off; revisit once the tooling
+    # around this feature has settled.
+    unnecessary_type_name_in_constructor: false
+
+# `melos run analyze` deletes every `.dart_tool/solid_lints/
+# duplicate_index.json` before analysing — avoid_duplicate_code's own
+# persisted cross-file index below can go stale across runs and cause a
+# false positive (and, separately, a false negative); see `analyze`'s
+# description in the root `pubspec.yaml` and `core/tooling/tooling/lib/src/
+# duplicate_index_cleanup.dart`'s doc comment.
+# mvc_lints rules (core/architecture/mvc_lints, plugin-only — see `plugins:`
+# above). All three are error-severity warning rules, enabled by default;
+# listed anyway so the enabled set is visible here. A "view" is a file named
+# `*_view.dart`, a file under a `widgets/` or `layouts/` directory, or a
+# file declaring a `ViewWidget`/`InheritedViewWidget` subclass.
+mvc_lints:
+  diagnostics:
+    # A view may not import go_router, url_launcher, appwrite, or anything
+    # under `repositories/` or `data/`.
+    avoid_view_restricted_imports: true
+    # A view may not call `Navigator.*` or `context.go/push/pop/replace`.
+    avoid_view_navigation_calls: true
+    # A `*_view.dart` declares only its view widget; every helper widget
+    # (StatelessWidget, StatefulWidget, InheritedWidget, ViewWidget family)
+    # lives in the feature's `widgets/` folder, one public widget per file.
+    avoid_extra_widgets_in_view_files: true
+
+# solid_lints thresholds (package:solid_lints, MIT, plugin-only — see
+# `plugins:` above). Every rule here is a warning rule (registered via
+# `registerWarningRule`, matching solid_lints' own convention), so each is
+# enabled by default; listed anyway for the documented threshold. Excluded
+# from generated files by the top-level `analyzer.exclude` list above, which
+# applies before any rule (built-in or plugin) runs.
+solid_lints:
+  diagnostics:
+    cyclomatic_complexity:
+      # NIST 500-235 §2.5's ceiling for a single function's independent
+      # decision paths — solid_lints' own default; kept explicit so a future
+      # change is a deliberate diff, not a silent inherited default.
+      max_complexity: 10
+    function_lines_of_code:
+      # A function that doesn't fit on one screen is a refactor candidate,
+      # not a review problem — tighter than solid_lints' default of 200.
+      max_lines: 50
+      # `main` (package:test's entrypoint, or a bin script's) necessarily
+      # nests every group()/test() call or every CLI branch lexically inside
+      # itself — length there isn't a complexity signal the way it is for an
+      # ordinary function, and solid_lints has no path-based exclude to
+      # scope this to test/ specifically.
+      exclude:
+        - main
+    number_of_parameters:
+      # Counts every parameter, positional or named alike (solid_lints does
+      # not distinguish — see NumberOfParametersVisitor); past 4, group the
+      # arguments into a params object instead.
+      max_parameters: 4
+    avoid_late_keyword: true
+    no_empty_block: true
+    avoid_unnecessary_setstate: true
+    avoid_non_null_assertion: true
+    # Not one of the documented thresholds above, but left configured (not
+    # disabled) because solid_lints' own default order — super/required_super
+    # before plain required — directly conflicts with very_good_analysis'
+    # built-in `always_put_required_named_parameters_first`, which wants
+    # every required parameter (including `required this.x`) ahead of any
+    # optional one, `super.key` included. This order agrees with that rule.
+    named_parameters_ordering:
+      order:
+        - required
+        - required_super
+        - super
+        - nullable
+        - default
+    # Also not a documented threshold, and also configured (not disabled)
+    # for the same reason as named_parameters_ordering above: solid_lints'
+    # default member order puts fields before the constructor, which
+    # directly conflicts with very_good_analysis' `sort_constructors_first`.
+    # This order agrees with that rule instead.
+    member_ordering:
+      order:
+        - constructors
+        - fields
+        - getters_setters
+        - methods
+    # solid_lints 1.0.0 has no dedicated max-nesting-depth rule (checked its
+    # lib/src/lints/ listing) — `prefer_early_return` is the closest
+    # available proxy but is a style rule, not a threshold, and is left off
+    # here to keep this block to documented thresholds only.

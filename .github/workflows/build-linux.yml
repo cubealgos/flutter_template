@@ -1,0 +1,60 @@
+# Verification only — no deployment step in this file. Runs on a
+# GitHub-hosted Linux runner (single, repeated `runs-on:` value — see ci.yml;
+# prerequisites in `.github/RUNNER.md`). Toolchain: `.github/actions/setup`.
+#
+# The first (and only) job here that actually compiles apps/app's Linux
+# desktop target (`flutter build linux`), catching a CMake/runner
+# regression no other check can — needs the Linux desktop
+# toolchain plus `libwebkit2gtk-4.1-dev`/`libsoup-3.0-dev`
+# (`desktop_webview_window`, pulled in through the `appwrite` SDK's
+# `flutter_web_auth_2`). Those apt packages are installed by the
+# first step below. Its own job: the slowest check, and the only one needing the
+# native toolchain.
+#
+# The C/C++ compile goes through ccache. `~/.ccache` is not persisted
+# between hosted runs, so the stats below mostly show a cold cache;
+# `CMAKE_C_COMPILER_LAUNCHER`/`CMAKE_CXX_COMPILER_LAUNCHER` are set as
+# plain env (a genuine CMake environment variable since CMake 3.17),
+# `CCACHE_MAXSIZE=2G`; `ccache -s` after the build prints the hit-rate stats
+# showing whether compiled objects were reused.
+
+name: build-linux
+
+on:
+  push:
+    branches: [development, production]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+
+      - name: Install Linux desktop build dependencies
+        shell: bash
+        run: |
+          set -e
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev \
+            libstdc++-14-dev libwebkit2gtk-4.1-dev libsoup-3.0-dev ccache
+
+      - name: flutter build linux
+        shell: bash
+        run: |
+          set -e
+          flutter config --enable-linux-desktop
+          export CCACHE_DIR="$HOME/.ccache"
+          mkdir -p "$CCACHE_DIR"
+          export CMAKE_C_COMPILER_LAUNCHER=ccache
+          export CMAKE_CXX_COMPILER_LAUNCHER=ccache
+          export CCACHE_MAXSIZE=2G
+          (cd apps/app && flutter build linux)
+          ccache -s

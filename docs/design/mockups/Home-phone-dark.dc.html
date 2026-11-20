@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@300..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --ground: #0B0E14;
+  --surface: #141A24;
+  --edge: #3C4657;
+  --ink: #E8EDF5;
+  --muted: #8F9BB0;
+  --signal: #5B6CFF;
+  --signal-light: #A8B2FF;
+  --on-signal: #0B0E14;
+  --danger: #EF9A9A;
+  --success: #81C784;
+  --warning: #FFB74D;
+  --scrim: rgba(11,14,20,0.72);
+}
+body { margin: 0; background: var(--ground); }
+
+* { box-sizing: border-box; border-radius: 0; }
+.chip-dot, .checkbox-box.circle { border-radius: 50%; }
+html, body { margin: 0; padding: 0; }
+.root { font-family: 'Host Grotesk', system-ui, sans-serif; }
+.mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+
+.t-display { font: 700 32px/1.1 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--ink); }
+.t-h1 { font: 700 24px/1.2 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--ink); }
+.t-h2 { font: 700 20px/1.3 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--ink); }
+.t-h3 { font: 600 16px/1.3 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--ink); }
+.t-body { font: 400 16px/1.6 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--ink); }
+.t-body-sm { font: 400 14px/1.5 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--ink); }
+.t-body-sm-muted { font: 400 14px/1.5 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--muted); }
+.t-caption { font: 400 12px/1.5 'Host Grotesk', system-ui, sans-serif; margin: 0; color: var(--muted); }
+.t-eyebrow { font: 600 14px/1.4 'Host Grotesk', system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.04em; margin: 0; color: var(--muted); text-align: center; }
+.t-eyebrow-signal { font: 600 14px/1.4 'Host Grotesk', system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.04em; margin: 0; color: var(--signal-light); }
+.t-mono { font: 400 16px/1.4 'IBM Plex Mono', ui-monospace, monospace; margin: 0; color: var(--ink); }
+
+a { color: var(--signal-light); }
+a:hover { text-decoration: none; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 24px; font: 600 16px/1 'Host Grotesk', system-ui, sans-serif; border: 1px solid transparent; text-decoration: none; cursor: pointer; box-sizing: border-box; border-radius: 0; }
+.btn-block { width: 100%; }
+.btn-primary { background: var(--signal); color: var(--on-signal); border-color: var(--signal); }
+.btn-secondary { background: transparent; color: var(--ink); border: 1px solid var(--edge); }
+.btn-sm { min-height: 44px; padding: 0 16px; font-size: 14px; }
+.btn-link { background: none; border: none; padding: 0; min-height: auto; color: var(--signal-light); font: 600 14px 'Host Grotesk', system-ui, sans-serif; text-decoration: underline; cursor: pointer; }
+.btn-icon { width: 44px; height: 44px; padding: 0; background: transparent; border: 1px solid transparent; color: var(--ink); flex-shrink: 0; }
+.btn:disabled, .btn-disabled { opacity: 0.45; cursor: not-allowed; }
+.btn:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+
+.btn-row { display: flex; gap: 16px; }
+.btn-row .btn { flex: 1 1 0; }
+
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field-label { font: 600 14px/1.3 'Host Grotesk', system-ui, sans-serif; color: var(--ink); }
+.field input { box-sizing: border-box; width: 100%; height: 48px; padding: 0 16px; font: 400 16px 'Host Grotesk', system-ui, sans-serif; color: var(--ink); background: var(--surface); border: 1px solid var(--edge); border-radius: 0; }
+.field input:focus { outline: 2px solid var(--signal); outline-offset: 2px; border-color: var(--signal); }
+
+.header { display: flex; align-items: center; gap: 4px; min-height: 56px; }
+.header .t-h1 { flex: 1 1 auto; }
+
+.chevron { color: var(--muted); flex-shrink: 0; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+.radio-row { position: relative; display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px; border: 1px solid var(--edge); cursor: pointer; }
+.radio-row.selected { border-color: var(--signal); }
+.radio-box { width: 20px; height: 20px; border: 2px solid var(--edge); flex-shrink: 0; position: relative; }
+.radio-row.selected .radio-box { border-color: var(--signal); }
+.radio-row.selected .radio-box::after { content: ""; position: absolute; top: 3px; left: 3px; width: 10px; height: 10px; background: var(--signal); }
+
+.dots { display: flex; gap: 8px; align-items: center; justify-content: center; }
+.dot { width: 8px; height: 8px; border: 1px solid var(--edge); background: transparent; flex-shrink: 0; }
+.dot.active { border-color: var(--signal); background: var(--signal); }
+
+.saved-hint { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+
+.avatar-picker { width: 96px; height: 96px; border: 1px solid var(--edge); background: var(--surface); display: flex; align-items: center; justify-content: center; color: var(--muted); }
+
+.setup-card { border: 1px solid var(--edge); background: var(--surface); padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+
+
+</style>
+</helmet>
+<div class="root" style="width: 390px; height: 844px; background: var(--ground); position: relative; overflow: visible;">
+<div style="display:flex;flex-direction:column;height:100%;"><div class="header" style="padding:16px;"><h1 class="t-h1">Home</h1><button type="button" class="btn btn-icon" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></button></div><div style="padding-top:16px;"><div style="padding:0 16px;">
+<div class="setup-card">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;flex-direction:column;gap:2px;">
+      <h3 class="t-h3">Finish your setup</h3>
+      <p class="t-caption">2 of 3 done</p>
+    </div>
+    <button type="button" class="btn btn-icon" aria-label="Dismiss" style="width:32px;height:32px;min-height:32px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div style="display:flex;flex-direction:column;"><div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;"><span class="t-body-sm">Preferences</span><span class="chevron"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="chevron"><path d="M9 18l6-6-6-6"/></svg></span></div><div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--edge);"><span class="t-body-sm">Notifications</span><span class="chevron"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="chevron"><path d="M9 18l6-6-6-6"/></svg></span></div></div>
+</div>
+</div></div><div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px;"><div style="display:flex;flex-direction:column;gap:16px;align-items:center;"><div style="color:var(--muted);"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div><p class="t-body" style="color:var(--muted);text-align:center;max-width:280px;">Nothing here yet &mdash; this is where your content will show up.</p></div></div><div style="padding:24px;"><button type="button" class="btn btn-secondary btn-block">Sign out</button></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

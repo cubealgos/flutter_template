@@ -1,0 +1,19 @@
+dartdoc:
+  errors:
+    - unresolved-doc-reference
+    - broken-link
+  # Excluded from documentation (not just analysis — see
+  # analysis_options.yaml's own comment on main.server.options.dart): both
+  # of this app's server entrypoint files trigger a dartdoc bug where the
+  # package-index page's link to a library whose only top-level member is
+  # `void main()` comes out broken (`dart doc --validate-links` then fails
+  # the build) — reproduced with both the file-path-inferred library name
+  # and an explicit dot-free one, so it is not the dotted-filename
+  # (main.server.dart, jaspr's own required naming convention) that's at
+  # fault. Neither file has meaningful public API to document anyway (an
+  # entrypoint wiring `runApp`, the same reason `bin/*.dart` scripts
+  # elsewhere in this workspace sit outside `docs-check`'s own
+  # `dirExists: [lib]` filter).
+  exclude:
+    - 'package:website/main.server.dart'
+    - 'package:website/main.server.options.dart'

@@ -1,0 +1,65 @@
+name: tokens_builder
+description: >-
+  A build_runner Builder that turns DTCG design-token JSON
+  (`core/design/ui/tokens/*.json`) into `package:mix` token declarations
+  (`core/design/ui/lib/src/tokens.g.dart`). Deliberately depends only on
+  `package:build` (not `package:analyzer`/`source_gen`) — it reads plain
+  JSON assets, not annotated Dart source, so it never needs the analyzer
+  and never constrains the workspace's analyzer 10.x-13.x pin. The
+  template owns its own copy of the token source rather than depending on
+  a separate design-system repository, and every dimension unit is handled
+  explicitly here rather than through an assumed transform (Style
+  Dictionary's flutter transform group assumes `rem`).
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  # BSD-3-Clause (Dart team, pub.dev verified 2026-09-24; on the
+  # dependency-license allow list). The Builder/BuildStep/AssetId API this
+  # package implements against — no analyzer, no source_gen: the builder
+  # reads JSON assets, not annotated Dart source. Pinned to ^4.0.7 (not an
+  # open caret from an older major) because that's what `build_runner
+  # 2.15.1` — itself pinned exactly in packages/domain's pubspec.yaml for
+  # the workspace's shared analyzer 10.x resolution — depends on; the
+  # workspace has one pub resolution for every member, so this has to
+  # agree rather than pick its own range.
+  build: ^4.0.7
+  # BSD-3-Clause (Dart team). Formats `tokens.g.dart` before it's written —
+  # generating already-formatted output is the builder's own job, not a
+  # `dart format` post-step in `melos run gen` (a bare `melos exec --
+  # "dart run build_runner build"` never runs one). Pinned to ^3.1.0 to
+  # match the version this workspace's own resolution already settles on
+  # transitively (via build_runner -> ... -> dart_style 3.1.7), so it adds
+  # no new resolution constraint. `DartFormatter.latestLanguageVersion`
+  # supplies the required `languageVersion` — no direct `pub_semver`
+  # dependency needed for that alone.
+  dart_style: ^3.1.0
+  # BSD-3-Clause (Dart team). Used to enumerate `tokens/*.json` inputs via
+  # `buildStep.findAssets`.
+  glob: ^2.1.2
+  # BSD-3-Clause (Dart team). `p.basename` to key each read JSON source by
+  # its file name.
+  path: ^1.9.0
+
+dev_dependencies:
+  # BSD-3-Clause (Dart team). Pinned to the exact version packages/domain
+  # already pins the workspace's single shared resolution to — see that
+  # package's pubspec.yaml doc-comment for the full analyzer-compatibility
+  # reasoning. Pulled transitively by build_test too, but declared
+  # directly since this package's own tests run a real `build_runner
+  # build` subprocess against a fixture package (see
+  # test/end_to_end_builder_test.dart; build_test's mock resolver hits
+  # GeneratorForAnnotation stack overflows, which is why the
+  # annotation-matching mock harness is avoided here in favour of
+  # pure-function unit tests plus one real build_runner run).
+  build_runner: 2.15.1
+  test: ^1.25.0
+  # Own copy for the same reason every other workspace member declares one:
+  # this package's analysis_options.yaml `include: ../../analysis_options.yaml`
+  # chain reaches the root's `very_good_analysis` pin through the workspace's
+  # single shared pub resolution, not through a direct dependency of its own
+  # — see the root pubspec.yaml for the fuller explanation.
+  very_good_analysis: ^11.0.0

@@ -1,0 +1,43 @@
+# Verification only — no deployment step in this file. Runs on a
+# GitHub-hosted Linux runner (single, repeated `runs-on:` value — see ci.yml;
+# prerequisites in `.github/RUNNER.md`). Toolchain: `.github/actions/setup`.
+#
+# First `tooling:vuln_check`: a critical/high OSV advisory in the locked
+# dependency tree blocks the release. Then `tooling:sbom` and
+# `tooling:licence_bundle` for both apps
+# this template's release process actually verifies (`apps/app`, the
+# Flutter web build, and `apps/website`, the Jaspr static site (web is the only platform verified before
+# release, decision of 2026-09-25). A
+# **gate, not a publish step**: it fails the build if either tool itself
+# fails — the generated `sbom.cdx.json`/`THIRD_PARTY_LICENSES` under
+# `build/release/` are gitignored and never uploaded as artifacts from
+# this job. See `docs/release-artifacts.md`.
+#
+# Its own job, not a step of ci.yml: it resolves both apps'
+# dependency trees and reads every hosted package's licence text — heavier
+# than the quick checks, and a release-time concern that should fail under
+# its own name.
+
+name: release-artifacts
+
+on:
+  push:
+    branches: [development, production]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  release-artifacts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - run: dart run melos run vuln-check
+      - run: dart run melos run sbom
+      - run: dart run melos run sbom -- --app website
+      - run: dart run melos run licence-bundle
+      - run: dart run melos run licence-bundle -- --app website

@@ -1,0 +1,5 @@
+analyzer:
+  exclude:
+    - build/**
+    - test/fixtures/**/*.g.dart
+include: ../../../analysis_options.yaml
